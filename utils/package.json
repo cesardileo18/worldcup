@@ -1,0 +1,11 @@
+{
+  "name": "utils",
+  "version": "1.0.0",
+  "description": "Utilidades para el proyecto Mundial 2026",
+  "scripts": {
+    "load-matches": "node load-matches.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
