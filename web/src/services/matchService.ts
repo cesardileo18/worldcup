@@ -6,7 +6,7 @@ const SEASON_ID = '285023'; // 2026 World Cup
 const COMPETITION_ID = '17'; // FIFA World Cup
 
 export interface Match {
-  game: number;
+  game: string;
   fifaId: string;
   round: string;
   group: string | null;
@@ -79,8 +79,8 @@ const fetchFromFifaApi = async (): Promise<MatchesData> => {
 const transformFifaData = (results: FifaApiMatch[]): MatchesData => {
   const matches: MatchesData = {};
 
-  results.forEach((item, index) => {
-    const game = index + 1;
+  results.forEach((item) => {
+    const game = item.IdMatch;
     const round = item.StageName?.[0]?.Description ?? '';
     const group =
       item.GroupName?.[0]?.Description?.replace('Group ', '') ?? null;
@@ -89,7 +89,7 @@ const transformFifaData = (results: FifaApiMatch[]): MatchesData => {
     const away = item.Away?.Abbreviation ?? item.PlaceHolderB;
     const awayName = item.Away?.ShortClubName ?? item.PlaceHolderB;
 
-    matches[String(game)] = {
+    matches[game] = {
       game,
       fifaId: item.IdMatch,
       round,

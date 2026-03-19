@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../firebase';
+import { signInWithDomainCheck, UnauthorizedDomainError } from '../firebase';
 import { bgImage, worldcupLogo } from '../assets';
 import { AppLayout, Button, Card, LeaguePicture } from '../components';
 import { useAuth, useLeague } from '../hooks';
@@ -120,10 +119,14 @@ export const JoinLeague = () => {
     });
 
     setSigningIn(true);
-    signInWithPopup(auth, googleProvider).catch((err) => {
-      console.error('Sign in error:', err);
+    signInWithDomainCheck().catch((err) => {
       setSigningIn(false);
       clearJoinIntent();
+      if (err instanceof UnauthorizedDomainError) {
+        setError(err.message);
+      } else {
+        console.error('Sign in error:', err);
+      }
     });
   };
 

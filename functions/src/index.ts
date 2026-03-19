@@ -11,7 +11,7 @@ const FIFA_COMPETITION_ID = '17'; // FIFA World Cup
 const FIFA_SEASON_ID = '285023'; // 2026
 
 interface Match {
-  game: number;
+  game: string;
   fifaId: string;
   homeScore: number;
   awayScore: number;
@@ -111,24 +111,23 @@ export const updateMatchScores = onSchedule('every 1 minutes', async () => {
       return;
     }
 
-    // Update scores for matching games
+    // Update scores — gameId IS the FIFA IdMatch, so direct lookup O(n)
     const updates: Record<string, number> = {};
 
     for (const fifaMatch of data.Results) {
-      for (const [gameId, match] of Object.entries(matches)) {
-        if (match.fifaId === fifaMatch.IdMatch) {
-          const homeScore = fifaMatch.Home?.Score ?? -1;
-          const awayScore = fifaMatch.Away?.Score ?? -1;
+      const match = matches[fifaMatch.IdMatch];
+      if (match) {
+        const homeScore = fifaMatch.Home?.Score ?? -1;
+        const awayScore = fifaMatch.Away?.Score ?? -1;
 
-          if (match.homeScore !== homeScore && homeScore >= 0) {
-            updates[`matches/${gameId}/homeScore`] = homeScore;
-            logger.info(`Updated game ${gameId} home score: ${homeScore}`);
-          }
+        if (match.homeScore !== homeScore && homeScore >= 0) {
+          updates[`matches/${fifaMatch.IdMatch}/homeScore`] = homeScore;
+          logger.info(`Updated game ${fifaMatch.IdMatch} home score: ${homeScore}`);
+        }
 
-          if (match.awayScore !== awayScore && awayScore >= 0) {
-            updates[`matches/${gameId}/awayScore`] = awayScore;
-            logger.info(`Updated game ${gameId} away score: ${awayScore}`);
-          }
+        if (match.awayScore !== awayScore && awayScore >= 0) {
+          updates[`matches/${fifaMatch.IdMatch}/awayScore`] = awayScore;
+          logger.info(`Updated game ${fifaMatch.IdMatch} away score: ${awayScore}`);
         }
       }
     }

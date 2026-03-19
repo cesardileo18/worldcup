@@ -53,7 +53,6 @@ export const Sidebar = () => {
             >
               Reglas
             </Link>
-            <span className="text-white/20">•</span>
             {/* <Link
               to="/about"
               className="text-white/50 hover:text-white transition-colors flex items-center gap-1"

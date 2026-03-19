@@ -1,6 +1,6 @@
 import React from 'react';
-import { type User, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
+import { type User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth, isEmailAllowed } from '../firebase';
 import { handleUserLogin, joinLeague, isLeagueMember, type UserData } from '../services';
 import { AuthContext } from './AuthContext';
 
@@ -51,6 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser && !isEmailAllowed(currentUser.email ?? '')) {
+        void signOut(auth);
+        return;
+      }
       setUser(currentUser);
       if (currentUser) {
         handleUserLogin(currentUser)

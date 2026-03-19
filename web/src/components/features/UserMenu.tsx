@@ -1,8 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
-import { auth, googleProvider } from '../../firebase';
+import { auth, signInWithDomainCheck, UnauthorizedDomainError } from '../../firebase';
 import { sidebarMenuBg } from '../../assets';
 import { useAuth } from '../../hooks/useAuth';
 import { useLeague } from '../../hooks/useLeague';
@@ -24,7 +24,9 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
   const { user, userData } = useAuth();
   const { selectedLeague, leagueMemberIds } = useLeague();
   const [isOpen, setIsOpen] = React.useState(false);
+  const [authError, setAuthError] = React.useState<string | null>(null);
   const [allUsers, setAllUsers] = React.useState<UserWithId[]>([]);
+  const [dropdownRect, setDropdownRect] = React.useState<DOMRect | null>(null);
   const buttonRef = React.useRef<HTMLDivElement>(null);
   const dropdownRef = React.useRef<HTMLUListElement>(null);
   const justSignedIn = React.useRef(false);
@@ -91,25 +93,43 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
   const closeMenu = () => setIsOpen(false);
 
   const handleSignIn = () => {
+    setAuthError(null);
     justSignedIn.current = true;
-    signInWithPopup(auth, googleProvider).catch((error) => {
+    signInWithDomainCheck().catch((error) => {
       justSignedIn.current = false;
-      console.error(error);
+      if (error instanceof UnauthorizedDomainError) {
+        setAuthError(error.message);
+      } else {
+        console.error(error);
+      }
     });
   };
 
   // Show sign in button if not authenticated
   if (!user) {
     return (
-      <Button onClick={handleSignIn} className={mobile ? 'text-xs' : 'w-full'}>
-        {mobile ? 'Ingresar' : 'Ingresar con Google'}
-      </Button>
+      <div className="flex flex-col items-center gap-1">
+        <Button onClick={handleSignIn} className={mobile ? 'text-xs' : 'w-full'}>
+          {mobile ? 'Ingresar' : 'Ingresar con Google'}
+        </Button>
+        {authError && (
+          <div className="flex items-center gap-2 bg-red-600/90 border border-red-400 rounded-lg px-3 py-2 mt-1 w-full">
+            <span className="text-white text-base leading-none">⚠️</span>
+            <p className="text-white text-xs font-semibold">{authError}</p>
+          </div>
+        )}
+      </div>
     );
   }
   return (
     <div ref={buttonRef} className="relative">
       <Button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen && buttonRef.current) {
+            setDropdownRect(buttonRef.current.getBoundingClientRect());
+          }
+          setIsOpen(!isOpen);
+        }}
         className={`flex items-center ${mobile ? 'gap-x-2 p-0! pr-2! border border-black/10 rounded-lg bg-white/10' : `w-full gap-3 justify-start px-3! p-2! border border-white/10 bg-black/20 backdrop-blur-sm ${isOpen ? 'rounded-t-xl rounded-b-none' : 'rounded-xl'}`}`}
       >
         {!mobile && userData && (
@@ -200,6 +220,15 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                       <span>⚽</span> Mis pronósticos
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/leaderboard"
+                      onClick={closeMenu}
+                      className={menuItemClass}
+                    >
+                      <span>🥇</span> Clasificación
+                    </Link>
+                  </li>
                   {/* <li>
                     <Link
                       to="/leagues"
@@ -271,14 +300,22 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
               </ul>,
               document.body
             )
-          ) : (
-            <ul
-              ref={dropdownRef}
-              className="p-2 w-full backdrop-blur-2xl bg-black/20 border border-white/10 border-t-0 rounded-b-xl"
-            >
-              {menuContent}
-            </ul>
-          );
+          ) : dropdownRect ? (
+            createPortal(
+              <ul
+                ref={dropdownRef}
+                className="p-2 fixed z-100 backdrop-blur-2xl bg-black/90 border border-white/10 border-t-0 rounded-b-xl shadow-xl"
+                style={{
+                  top: dropdownRect.bottom,
+                  left: dropdownRect.left,
+                  width: dropdownRect.width,
+                }}
+              >
+                {menuContent}
+              </ul>,
+              document.body
+            )
+          ) : null;
         })()}
     </div>
   );

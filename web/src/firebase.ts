@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
@@ -29,5 +29,32 @@ export const db = getDatabase(app);
 
 // Initialize Storage
 export const storage = getStorage(app);
+
+const allowedDomains = [
+  '@dataiq.com',
+  '@dataiq.com.ar',
+  '@dataiq.com.cl',
+  '@dataiq.com.uy',
+  '@dataiq-latam.com',
+];
+
+export const isEmailAllowed = (email: string): boolean =>
+  allowedDomains.some((domain) => email.toLowerCase().endsWith(domain));
+
+export class UnauthorizedDomainError extends Error {
+  constructor() {
+    super('Tu cuenta no tiene acceso a esta aplicación.');
+    this.name = 'UnauthorizedDomainError';
+  }
+}
+
+export const signInWithDomainCheck = async (): Promise<void> => {
+  const result = await signInWithPopup(auth, googleProvider);
+  const email = result.user.email ?? '';
+  if (!isEmailAllowed(email)) {
+    await signOut(auth);
+    throw new UnauthorizedDomainError();
+  }
+};
 
 export default app;

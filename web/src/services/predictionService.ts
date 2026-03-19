@@ -33,7 +33,7 @@ export const getUserPredictions = async (
  */
 export const getPrediction = async (
   userId: string,
-  gameId: number
+  gameId: string
 ): Promise<Prediction | null> => {
   const predictionRef = ref(db, `predictions/${userId}/${gameId}`);
   const snapshot = await get(predictionRef);
@@ -50,7 +50,7 @@ export const getPrediction = async (
  */
 export const savePrediction = async (
   userId: string,
-  gameId: number,
+  gameId: string,
   homePrediction: number,
   awayPrediction: number
 ): Promise<void> => {
