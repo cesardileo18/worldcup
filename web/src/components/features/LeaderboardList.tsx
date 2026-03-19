@@ -69,7 +69,7 @@ const UserRow = ({
       <button
         onClick={onRemove}
         className="p-1.5 text-white/30 rounded hover:cursor-pointer hover:text-white/80"
-        title="Remove from league"
+        title="Quitar de la liga"
       >
         ✕
       </button>
@@ -135,14 +135,14 @@ export const LeaderboardList = ({
 
   if (loading) {
     return (
-      <div className="text-white/50 text-sm text-center py-4">Loading...</div>
+      <div className="text-white/50 text-sm text-center py-4">Cargando...</div>
     );
   }
 
   if (users.length === 0) {
     return (
       <div className="text-white/50 text-sm text-center py-4">
-        No players yet
+        Todavía no hay jugadores
       </div>
     );
   }
@@ -162,7 +162,7 @@ export const LeaderboardList = ({
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="w-full flex items-center justify-between text-white/70 text-xs font-medium uppercase tracking-wider hover:text-white transition-colors"
             >
-              {selectedLeague ? selectedLeague.name : 'Leaderboard'}
+              {selectedLeague ? selectedLeague.name : 'Clasificación'}
               <span
                 className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
               >
@@ -187,7 +187,7 @@ export const LeaderboardList = ({
                       alt="Global"
                       className="w-10 h-10 rounded-xl object-cover"
                     />
-                    <span className="flex-1 truncate">FIFA WC 2026 POOL</span>
+                    <span className="flex-1 truncate">FIFA POOL 2026</span>
                     {!selectedLeague && <span className="ml-auto">✓</span>}
                   </button>
                 </li>
@@ -221,7 +221,7 @@ export const LeaderboardList = ({
           </div>
         ) : (
           <h3 className="text-white/70 text-xs font-medium uppercase tracking-wider mb-2 px-4">
-            Leaderboard
+            Clasificación
           </h3>
         ))}
       {/* Podium for full variant */}

@@ -50,9 +50,9 @@ export const EditLeague = () => {
     if (!league || !canDelete) return;
 
     const confirmed = await showConfirm({
-      title: 'Delete League',
-      message: `Are you sure you want to permanently delete "${league.name}"? This will remove all members and cannot be undone.`,
-      confirmText: 'Delete League',
+      title: 'Eliminar liga',
+      message: `¿Seguro que quieres eliminar de forma permanente "${league.name}"? Esto quitará a todos los miembros y no se puede deshacer.`,
+      confirmText: 'Eliminar liga',
     });
 
     if (!confirmed) return;
@@ -60,11 +60,11 @@ export const EditLeague = () => {
     setDeleting(true);
     try {
       await deleteLeague(league.id, league.slug);
-      showToast('League deleted successfully');
+      showToast('Liga eliminada correctamente');
       void navigate('/leagues', { replace: true });
     } catch (err) {
       console.error(err);
-      showToast('Failed to delete league', 'error');
+      showToast('No se pudo eliminar la liga', 'error');
       setDeleting(false);
     }
   };
@@ -125,11 +125,11 @@ export const EditLeague = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        setError('Please select an image file');
+        setError('Selecciona un archivo de imagen');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image must be less than 5MB');
+        setError('La imagen debe pesar menos de 5 MB');
         return;
       }
       setSelectedFile(file);
@@ -177,7 +177,7 @@ export const EditLeague = () => {
 
       void navigate(`/league/${finalSlug}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update league');
+      setError(err instanceof Error ? err.message : 'No se pudo actualizar la liga');
       setSaving(false);
     }
   };
@@ -190,7 +190,7 @@ export const EditLeague = () => {
     return (
       <AppLayout>
         <div className="pt-8 px-4 pb-8 max-w-md mx-auto">
-          <div className="text-center text-white/70 py-20">Loading...</div>
+          <div className="text-center text-white/70 py-20">Cargando...</div>
         </div>
       </AppLayout>
     );
@@ -202,10 +202,10 @@ export const EditLeague = () => {
         <div className="pt-8 px-4 pb-8 max-w-md mx-auto">
           <Card className="p-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-4">
-              League not found
+              Liga no encontrada
             </h1>
             <Link to="/leagues" className="text-white/70 hover:text-white">
-              ← Back to My Leagues
+              ← Volver a mis ligas
             </Link>
           </Card>
         </div>
@@ -219,16 +219,16 @@ export const EditLeague = () => {
         <div className="pt-8 px-4 pb-8 max-w-md mx-auto">
           <Card className="p-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-4">
-              Not Authorized
+              No autorizado
             </h1>
             <p className="text-white/70 mb-4">
-              Only the league owner can edit this league.
+              Solo el dueño de la liga puede editar esta liga.
             </p>
             <Link
               to={`/league/${league.slug}`}
               className="text-white/70 hover:text-white"
             >
-              ← Back to League
+              ← Volver a la liga
             </Link>
           </Card>
         </div>
@@ -242,7 +242,7 @@ export const EditLeague = () => {
         <div className="w-full max-w-md">
           <Card className="p-6">
             <h1 className="text-2xl font-bold text-white mb-6 text-center">
-              Edit League
+              Editar liga
             </h1>
 
             <form
@@ -262,7 +262,7 @@ export const EditLeague = () => {
                     <Button
                       onClick={handleRemovePhoto}
                       className="absolute px-0! -top-1 -right-1 rounded-full w-8 h-8 backdrop-blur-lg border-none opacity-70 hover:opacity-100"
-                      title="Undo"
+                      title="Deshacer"
                     >
                       <span className="text-sm">↩️</span>
                     </Button>
@@ -280,21 +280,21 @@ export const EditLeague = () => {
                   htmlFor="league-image-upload"
                   className="text-sm text-white/60 hover:text-white cursor-pointer transition-colors"
                 >
-                  Change Image
+                  Cambiar imagen
                 </label>
               </div>
 
               {/* League Name */}
               <div>
                 <label htmlFor="name" className={labelClass}>
-                  League Name
+                  Nombre de la liga
                 </label>
                 <input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="League name"
+                  placeholder="Nombre de la liga"
                   className={inputClass}
                   required
                 />
@@ -324,22 +324,22 @@ export const EditLeague = () => {
                   />
                   {slugStatus === 'checking' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">
-                      Checking...
+                      Verificando...
                     </span>
                   )}
                   {slugStatus === 'available' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 text-sm">
-                      ✓ Available
+                      ✓ Disponible
                     </span>
                   )}
                   {slugStatus === 'taken' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 text-sm">
-                      ✗ Taken
+                      ✗ Ocupado
                     </span>
                   )}
                   {slugStatus === 'invalid' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 text-sm">
-                      ✗ Too short
+                      ✗ Muy corto
                     </span>
                   )}
                 </div>
@@ -348,13 +348,13 @@ export const EditLeague = () => {
               {/* Description */}
               <div>
                 <label htmlFor="description" className={labelClass}>
-                  Description
+                  Descripción
                 </label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What's this league about?"
+                  placeholder="¿De qué trata esta liga?"
                   rows={3}
                   className={`${inputClass} resize-none`}
                 />
@@ -368,7 +368,7 @@ export const EditLeague = () => {
                   variant="secondary"
                   className="flex-1"
                 >
-                  Cancel
+                  Cancelar
                 </LinkButton>
                 <Button
                   type="submit"
@@ -383,7 +383,7 @@ export const EditLeague = () => {
                   }
                   className="flex-1"
                 >
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>
 
@@ -396,7 +396,7 @@ export const EditLeague = () => {
                     disabled={deleting}
                     className="text-sm text-red-400/70 hover:text-red-400 transition-colors disabled:opacity-50 hover:cursor-pointer"
                   >
-                    {deleting ? 'Deleting...' : 'Delete this league'}
+                    {deleting ? 'Eliminando...' : 'Eliminar esta liga'}
                   </button>
                 </div>
               )}

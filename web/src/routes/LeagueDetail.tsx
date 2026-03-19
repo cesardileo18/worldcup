@@ -59,7 +59,7 @@ export const LeagueDetail = () => {
         // Not logged in - mark as checked (will redirect)
         setAccessChecked(true);
       } else {
-        // League not found - mark as checked
+        // Liga no encontrada - mark as checked
         setAccessChecked(true);
       }
 
@@ -73,7 +73,7 @@ export const LeagueDetail = () => {
   React.useEffect(() => {
     if (loading || !accessChecked) return;
 
-    // League not found is handled by the render below
+    // Liga no encontrada is handled by the render below
     if (!league) return;
 
     // Not logged in or not a member - redirect
@@ -120,9 +120,9 @@ export const LeagueDetail = () => {
     if (!league || !user || isOwner) return;
 
     const confirmed = await showConfirm({
-      title: 'Leave League',
-      message: 'Are you sure you want to leave this league?',
-      confirmText: 'Leave',
+      title: 'Salir de la liga',
+      message: '¿Seguro que quieres salir de esta liga?',
+      confirmText: 'Salir',
     });
 
     if (!confirmed) return;
@@ -142,10 +142,10 @@ export const LeagueDetail = () => {
     if (!league || !isOwner) return;
 
     const confirmed = await showConfirm({
-      title: 'Regenerate Invite Code',
+      title: 'Regenerar código de invitación',
       message:
-        "This will invalidate the old invite code. Anyone with the old link won't be able to join.",
-      confirmText: 'Regenerate',
+        'Esto invalidará el código anterior. Quien tenga el enlace viejo ya no podrá unirse.',
+      confirmText: 'Regenerar',
     });
 
     if (!confirmed) return;
@@ -163,24 +163,24 @@ export const LeagueDetail = () => {
 
     // Don't allow removing the owner
     if (userId === league.ownerId) {
-      showToast("Can't remove the league owner", 'error');
+      showToast("No puedes quitar al dueño de la liga", 'error');
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Remove Member',
-      message: `Are you sure you want to remove ${displayName} from this league?`,
-      confirmText: 'Remove',
+      title: 'Quitar miembro',
+      message: `¿Seguro que quieres quitar a ${displayName} de esta liga?`,
+      confirmText: 'Quitar',
     });
 
     if (!confirmed) return;
 
     try {
       await leaveLeague(league.id, userId);
-      showToast(`${displayName} has been removed from the league`);
+      showToast(`${displayName} fue quitado de la liga`);
     } catch (err) {
       console.error(err);
-      showToast('Failed to remove member', 'error');
+      showToast('No se pudo quitar al miembro', 'error');
     }
   };
 
@@ -191,14 +191,14 @@ export const LeagueDetail = () => {
 
   const copyShareableLink = () => {
     void navigator.clipboard.writeText(getShareableLink());
-    showToast('Link copied to clipboard');
+    showToast('Enlace copiado al portapapeles');
   };
 
   if (loading || !accessChecked) {
     return (
       <AppLayout>
         <div className="pt-8 px-4 pb-8 max-w-2xl mx-auto">
-          <div className="text-center text-white/70 py-20">Loading...</div>
+          <div className="text-center text-white/70 py-20">Cargando...</div>
         </div>
       </AppLayout>
     );
@@ -209,7 +209,7 @@ export const LeagueDetail = () => {
     return (
       <AppLayout>
         <div className="pt-8 px-4 pb-8 max-w-2xl mx-auto">
-          <div className="text-center text-white/70 py-20">Redirecting...</div>
+          <div className="text-center text-white/70 py-20">Redirigiendo...</div>
         </div>
       </AppLayout>
     );
@@ -221,10 +221,10 @@ export const LeagueDetail = () => {
         <div className="pt-8 px-4 pb-8 max-w-2xl mx-auto">
           <Card className="p-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-4">
-              League not found
+              Liga no encontrada
             </h1>
             <Link to="/leagues" className="text-white/70 hover:text-white">
-              ← Back to My Leagues
+              ← Volver a mis ligas
             </Link>
           </Card>
         </div>
@@ -243,7 +243,7 @@ export const LeagueDetail = () => {
               to="/leagues"
               className="text-white/50 hover:text-white text-sm"
             >
-              ← My Leagues
+              ← Mis ligas
             </Link>
             {isMember && !isOwner && (
               <Button
@@ -251,7 +251,7 @@ export const LeagueDetail = () => {
                 disabled={leaving}
                 className="text-xs"
               >
-                {leaving ? 'Leaving...' : 'Leave'}
+                {leaving ? 'Saliendo...' : 'Salir'}
               </Button>
             )}
             {isOwner && (
@@ -259,7 +259,7 @@ export const LeagueDetail = () => {
                 to={`/league/${league.slug}/edit`}
                 className="text-xs"
               >
-                Edit
+                Editar
               </LinkButton>
             )}
           </div>
@@ -282,16 +282,16 @@ export const LeagueDetail = () => {
           <Card className="p-4 mb-6 overflow-hidden">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-white font-medium">Invite Friends</h3>
+                <h3 className="text-white font-medium">Invitar amigos</h3>
                 <p className="text-white/50 text-sm">
-                  Share this link to invite others
+                  Comparte este enlace para invitar a otros
                 </p>
               </div>
               <Button
                 onClick={() => setShowInviteCode(!showInviteCode)}
                 className={`text-xs ${showInviteCode ? 'border-0' : ''}`}
               >
-                {showInviteCode ? '✕' : 'Show Link'}
+                {showInviteCode ? '✕' : 'Mostrar enlace'}
               </Button>
             </div>
             {showInviteCode && (
@@ -307,12 +307,12 @@ export const LeagueDetail = () => {
                     onClick={copyShareableLink}
                     className="text-sm w-full"
                   >
-                    Copy Link
+                    Copiar enlace
                   </Button>
                 </div>
                 {/* QR Code */}
                 <div className="flex flex-col items-center gap-3 pt-3 border-t border-white/10">
-                  <p className="text-white/50 text-sm">Scan to join</p>
+                  <p className="text-white/50 text-sm">Escanea para unirte</p>
                   <div
                     className="bg-white p-3 rounded-xl"
                     id="qr-code-container"
@@ -340,13 +340,13 @@ export const LeagueDetail = () => {
                     }}
                     className="text-sm"
                   >
-                    Download QR
+                    Descargar QR
                   </Button>
                 </div>
                 {/* Invite Code */}
                 <div className="flex items-center justify-between pt-3 border-t border-white/10">
                   <span className="text-white/50 text-sm">
-                    Code:{' '}
+                    Código:{' '}
                     <span className="font-mono text-white">
                       {league.inviteCode}
                     </span>
@@ -356,7 +356,7 @@ export const LeagueDetail = () => {
                       onClick={() => void handleRegenerateCode()}
                       className="text-sm"
                     >
-                      Regenerate
+                      Regenerar
                     </Button>
                   )}
                 </div>
