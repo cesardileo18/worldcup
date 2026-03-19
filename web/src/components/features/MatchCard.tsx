@@ -92,7 +92,7 @@ export const MatchCard = ({
   const predictionClass =
     'w-10 h-8 flex items-center justify-center bg-blue-600/30 border border-blue-400/30 rounded text-lg font-bold';
 
-  const dateString = matchDate.toLocaleDateString([], {
+  const dateString = matchDate.toLocaleDateString('es-ES', {
     month: 'short',
     day: 'numeric',
   });
@@ -226,7 +226,7 @@ export const MatchCard = ({
 
       {/* Footer: Group, Stadium, Date/Time */}
       <div className="flex items-center gap-2 text-xs text-white/50">
-        {match.group && <span>Group: {match.group}</span>}
+        {match.group && <span>Grupo: {match.group}</span>}
         {match.group && <span>·</span>}
         <span className="truncate">
           {match.locationCity}, {match.locationCountry}
@@ -238,7 +238,7 @@ export const MatchCard = ({
         {isLive && (
           <span className="ml-auto flex items-center gap-1.5 text-red-500 font-bold animate-pulse">
             <span className="w-2 h-2 bg-red-500 rounded-full" />
-            LIVE
+            EN VIVO
           </span>
         )}
       </div>
