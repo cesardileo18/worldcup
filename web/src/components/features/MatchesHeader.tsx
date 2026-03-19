@@ -11,7 +11,7 @@ type MatchesHeaderProps = {
 export const MatchesHeader = ({
   viewMode,
   onViewModeChange,
-  title = 'Matches',
+  title = 'Partidos',
 }: MatchesHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-6">
@@ -21,13 +21,13 @@ export const MatchesHeader = ({
           active={viewMode === 'day'}
           onClick={() => onViewModeChange('day')}
         >
-          By Day
+          Por día
         </Chip>
         <Chip
           active={viewMode === 'group'}
           onClick={() => onViewModeChange('group')}
         >
-          By Group
+          Por grupo
         </Chip>
       </div>
     </div>

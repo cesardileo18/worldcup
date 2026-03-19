@@ -20,9 +20,9 @@ export const AppLayout = ({ children, className = '' }: AppLayoutProps) => {
     {
       to: userData ? `/${userData.userName}` : '/',
       icon: '⚽',
-      label: userData ? 'My Predictions' : 'All Matches',
+      label: userData ? 'Mis pronósticos' : 'Todos los partidos',
     },
-    { to: '/leaderboard', icon: '🥇', label: 'Leaderboard' },
+    { to: '/leaderboard', icon: '🥇', label: 'Clasificación' },
     // { to: '/leagues', icon: '🏆', label: 'Leagues' },
   ];
 
@@ -77,11 +77,11 @@ export const AppLayout = ({ children, className = '' }: AppLayoutProps) => {
                   <>
                     <img
                       src={worldcupLogo}
-                      alt="World Cup 2026"
+                      alt="Mundial 2026"
                       className="h-8"
                     />
                     <span className="text-white font-light text-xs">
-                      FIFA WC 2026 POOL
+                      FIFA POOL 2026
                     </span>
                   </>
                 )}
