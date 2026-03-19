@@ -72,11 +72,11 @@ export const NewLeague = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        setError('Please select an image file');
+        setError('Selecciona un archivo de imagen');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image must be less than 5MB');
+        setError('La imagen debe pesar menos de 5 MB');
         return;
       }
       setSelectedFile(file);
@@ -117,7 +117,7 @@ export const NewLeague = () => {
 
       void navigate(`/league/${newLeague.slug}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create league');
+      setError(err instanceof Error ? err.message : 'No se pudo crear la liga');
       setSaving(false);
     }
   };
@@ -132,10 +132,10 @@ export const NewLeague = () => {
         <div className="pt-8 px-4 pb-8 max-w-md mx-auto">
           <Card className="p-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-4">
-              Sign in required
+              Inicio de sesión requerido
             </h1>
             <p className="text-white/70">
-              Please sign in to create a league.
+              Inicia sesión para crear una liga.
             </p>
           </Card>
         </div>
@@ -149,7 +149,7 @@ export const NewLeague = () => {
         <div className="w-full max-w-md">
           <Card className="p-6">
             <h1 className="text-2xl font-bold text-white mb-6 text-center">
-              Create League
+              Crear liga
             </h1>
 
             <form
@@ -161,7 +161,7 @@ export const NewLeague = () => {
                 <div className="relative">
                   <LeaguePicture
                     src={previewUrl}
-                    name={name || 'New League'}
+                    name={name || 'Nueva liga'}
                     size="xl"
                     className="border-2 border-white/20"
                   />
@@ -169,7 +169,7 @@ export const NewLeague = () => {
                     <Button
                       onClick={handleRemovePhoto}
                       className="absolute px-0! -top-1 -right-1 rounded-full w-8 h-8 backdrop-blur-lg border-none opacity-70 hover:opacity-100"
-                      title="Remove"
+                      title="Quitar"
                     >
                       <span className="text-sm">✕</span>
                     </Button>
@@ -187,21 +187,21 @@ export const NewLeague = () => {
                   htmlFor="league-image-upload"
                   className="text-sm text-white/60 hover:text-white cursor-pointer transition-colors"
                 >
-                  {previewUrl ? 'Change Image' : 'Add Image'}
+                  {previewUrl ? 'Cambiar imagen' : 'Agregar imagen'}
                 </label>
               </div>
 
               {/* League Name */}
               <div>
                 <label htmlFor="name" className={labelClass}>
-                  League Name
+                  Nombre de la liga
                 </label>
                 <input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="My Awesome League"
+                  placeholder="Mi liga increíble"
                   className={inputClass}
                   required
                 />
@@ -232,22 +232,22 @@ export const NewLeague = () => {
                   />
                   {slugStatus === 'checking' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-sm">
-                      Checking...
+                      Verificando...
                     </span>
                   )}
                   {slugStatus === 'available' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-400 text-sm">
-                      ✓ Available
+                      ✓ Disponible
                     </span>
                   )}
                   {slugStatus === 'taken' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 text-sm">
-                      ✗ Taken
+                      ✗ Ocupado
                     </span>
                   )}
                   {slugStatus === 'invalid' && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-red-400 text-sm">
-                      ✗ Too short
+                      ✗ Muy corto
                     </span>
                   )}
                 </div>
@@ -256,13 +256,13 @@ export const NewLeague = () => {
               {/* Description */}
               <div>
                 <label htmlFor="description" className={labelClass}>
-                  Description
+                  Descripción
                 </label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What's this league about?"
+                  placeholder="¿De qué trata esta liga?"
                   rows={3}
                   className={`${inputClass} resize-none`}
                 />
@@ -276,7 +276,7 @@ export const NewLeague = () => {
                   variant="secondary"
                   className="flex-1"
                 >
-                  Cancel
+                  Cancelar
                 </LinkButton>
                 <Button
                   type="submit"
@@ -290,7 +290,7 @@ export const NewLeague = () => {
                   }
                   className="flex-1"
                 >
-                  {saving ? 'Creating...' : 'Create League'}
+                  {saving ? 'Creando...' : 'Crear liga'}
                 </Button>
               </div>
             </form>
@@ -300,4 +300,3 @@ export const NewLeague = () => {
     </AppLayout>
   );
 };
-

@@ -55,7 +55,7 @@ export const JoinLeague = () => {
   // Fetch league info
   React.useEffect(() => {
     if (!slug) {
-      setError('Invalid link');
+      setError('Enlace inválido');
       setLoading(false);
       return;
     }
@@ -63,18 +63,18 @@ export const JoinLeague = () => {
     getLeagueBySlug(slug)
       .then((fetchedLeague) => {
         if (!fetchedLeague) {
-          setError('League not found');
+          setError('Liga no encontrada');
         } else if (
           inviteCode?.toUpperCase() !== fetchedLeague.inviteCode.toUpperCase()
         ) {
-          setError('Invalid invite code');
+          setError('Código de invitación inválido');
         } else {
           setLeague(fetchedLeague);
         }
       })
       .catch((err) => {
         console.error('Error fetching league:', err);
-        setError('Failed to load league');
+        setError('No se pudo cargar la liga');
       })
       .finally(() => setLoading(false));
   }, [slug, inviteCode]);
@@ -101,7 +101,7 @@ export const JoinLeague = () => {
         void navigate(`/league/${league.slug}`, { replace: true });
       } catch (err) {
         console.error('Error joining league:', err);
-        setError('Failed to join league');
+        setError('No se pudo unir a la liga');
         setJoining(false);
       }
     };
@@ -132,7 +132,7 @@ export const JoinLeague = () => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-white/70">Loading...</div>
+          <div className="text-white/70">Cargando...</div>
         </div>
       </AppLayout>
     );
@@ -147,10 +147,10 @@ export const JoinLeague = () => {
             <div className="text-4xl mb-4">😕</div>
             <h1 className="text-xl font-bold text-white mb-2">{error}</h1>
             <p className="text-white/60 mb-6">
-              This invite link may be invalid or expired.
+              Este enlace de invitación puede ser inválido o haber expirado.
             </p>
             <Button onClick={() => void navigate('/leagues')}>
-              Go to Leagues
+              Ir a ligas
             </Button>
           </Card>
         </div>
@@ -163,7 +163,7 @@ export const JoinLeague = () => {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-white/70">Joining {league.name}...</div>
+          <div className="text-white/70">Uniéndote a {league.name}...</div>
         </div>
       </AppLayout>
     );
@@ -185,11 +185,11 @@ export const JoinLeague = () => {
           <div className="flex items-center gap-3 mb-6">
             <img
               src={worldcupLogo}
-              alt="FIFA World Cup 2026"
+              alt="Copa Mundial FIFA 2026"
               className="h-12"
             />
             <span className="text-white font-light text-lg">
-              FIFA WC 2026 POOL
+              FIFA POOL 2026
             </span>
           </div>
 
@@ -202,20 +202,20 @@ export const JoinLeague = () => {
               />
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">
-              Join {league.name}
+              Unirse a {league.name}
             </h1>
             {league.description && (
               <p className="text-white/60 mb-6">{league.description}</p>
             )}
             <p className="text-white/50 text-sm mb-6">
-              Sign in to join this league and compete with friends!
+              Inicia sesión para unirte a esta liga y competir con tus amigos.
             </p>
             <Button
               onClick={handleSignIn}
               disabled={signingIn}
               className="w-full"
             >
-              {signingIn ? 'Signing in...' : 'Sign In with Google'}
+              {signingIn ? 'Iniciando sesión...' : 'Ingresar con Google'}
             </Button>
           </Card>
         </div>

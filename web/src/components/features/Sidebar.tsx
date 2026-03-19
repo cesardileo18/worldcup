@@ -32,7 +32,7 @@ export const Sidebar = () => {
             ) : (
               <img
                 src={worldcupLogo}
-                alt="World Cup 2026"
+                alt="Mundial 2026"
                 className="h-32 drop-shadow-lg"
               />
             )}
@@ -51,7 +51,7 @@ export const Sidebar = () => {
               to="/rules"
               className="text-white/50 hover:text-white transition-colors flex items-center gap-1"
             >
-              Rules
+              Reglas
             </Link>
             <span className="text-white/20">•</span>
             {/* <Link

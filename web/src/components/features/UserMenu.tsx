@@ -102,11 +102,10 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
   if (!user) {
     return (
       <Button onClick={handleSignIn} className={mobile ? 'text-xs' : 'w-full'}>
-        {mobile ? 'Sign In' : 'Sign In with Google'}
+        {mobile ? 'Ingresar' : 'Ingresar con Google'}
       </Button>
     );
   }
-  console.log({ user });
   return (
     <div ref={buttonRef} className="relative">
       <Button
@@ -122,9 +121,9 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
               className="border-0 rounded-lg"
             />
             {[
-              { label: 'Score', value: userData.score, show: true },
+              { label: 'Puntos', value: userData.score, show: true },
               {
-                label: 'Rank',
+                label: 'Posición',
                 value: getPositionCompact(position!),
                 show: position !== null,
               },
@@ -170,7 +169,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
               <div className="relative aspect-square h-10 flex flex-col items-center justify-center overflow-hidden border-r border-white/10 pr-2">
                 <div className="absolute inset-0 scale-[-1] opacity-70" />
                 <span className="relative text-white/60 text-[8px] uppercase tracking-wider">
-                  Rank
+                  Posición
                 </span>
                 <span className="relative text-white font-semibold text-sm">
                   {getPositionCompact(position)}
@@ -198,7 +197,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                       onClick={closeMenu}
                       className={menuItemClass}
                     >
-                      <span>⚽</span> My Predictions
+                      <span>⚽</span> Mis pronósticos
                     </Link>
                   </li>
                   {/* <li>
@@ -207,7 +206,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                       onClick={closeMenu}
                       className={menuItemClass}
                     >
-                      <span>🏆</span> My Leagues
+                      <span>🏆</span> Mis ligas
                     </Link>
                   </li> */}
                 </>
@@ -218,7 +217,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                   onClick={closeMenu}
                   className={menuItemClass}
                 >
-                  <span>✏️</span> Edit Profile
+                  <span>✏️</span> Editar perfil
                 </Link>
               </li>
               <li className={dividerClass} />
@@ -231,7 +230,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                       onClick={closeMenu}
                       className={menuItemClass}
                     >
-                      <span>📋</span> Rules
+                      <span>📋</span> Reglas
                     </Link>
                   </li>
                   {/* <li>
@@ -246,7 +245,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                   <li className={dividerClass} />
                 </>
               )}
-              {/* Sign Out */}
+              {/* Cerrar sesión */}
               <li>
                 <button
                   onClick={() => {
@@ -255,7 +254,7 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                   }}
                   className={menuItemClass}
                 >
-                  <span>👋</span> Sign Out
+                  <span>👋</span> Cerrar sesión
                 </button>
               </li>
             </>
