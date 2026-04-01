@@ -25,8 +25,18 @@ interface Prediction {
 
 interface FifaMatch {
   IdMatch: string;
-  Home: { Score: number | null };
-  Away: { Score: number | null };
+  Home: { Score: number | null; Abbreviation: string | null; ShortClubName: string | null };
+  Away: { Score: number | null; Abbreviation: string | null; ShortClubName: string | null };
+  StageName: Array<{ Description: string }>;
+  GroupName: Array<{ Description: string }> | null;
+  Date: string;
+  Stadium: {
+    Name: Array<{ Description: string }>;
+    CityName: Array<{ Description: string }>;
+    IdCountry: string;
+  };
+  PlaceHolderA: string;
+  PlaceHolderB: string;
 }
 
 interface FifaApiResponse {
@@ -233,3 +243,56 @@ export const updateUserScore = onValueWritten(
     }
   }
 );
+
+/**
+ * Scheduled function to refresh all match data from FIFA API once per day.
+ * Updates team names, groups, stadiums and any other match metadata
+ * that may change as teams qualify (e.g. knockout stage placeholders).
+ * Runs every day at 06:00 UTC.
+ */
+export const refreshMatchData = onSchedule('0 6 * * *', async () => {
+  logger.info('Refreshing full match data from FIFA API...');
+
+  try {
+    const apiUrl = `https://api.fifa.com/api/v3/calendar/matches?idseason=${FIFA_SEASON_ID}&idcompetition=${FIFA_COMPETITION_ID}&count=500`;
+
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`FIFA API error: ${response.status}`);
+    }
+
+    const data = await response.json() as FifaApiResponse;
+    const updates: Record<string, unknown> = {};
+
+    for (const item of data.Results) {
+      const gameId = item.IdMatch;
+      const home = item.Home?.Abbreviation ?? item.PlaceHolderA;
+      const homeName = item.Home?.ShortClubName ?? item.PlaceHolderA;
+      const away = item.Away?.Abbreviation ?? item.PlaceHolderB;
+      const awayName = item.Away?.ShortClubName ?? item.PlaceHolderB;
+      const round = item.StageName?.[0]?.Description ?? '';
+      const group = item.GroupName?.[0]?.Description?.replace('Group ', '') ?? null;
+      const location = item.Stadium?.Name?.[0]?.Description ?? '';
+      const locationCity = item.Stadium?.CityName?.[0]?.Description ?? '';
+      const locationCountry = item.Stadium?.IdCountry ?? '';
+      const timestamp = Math.floor(new Date(item.Date).getTime() / 1000);
+
+      updates[`matches/${gameId}/home`] = home;
+      updates[`matches/${gameId}/homeName`] = homeName;
+      updates[`matches/${gameId}/away`] = away;
+      updates[`matches/${gameId}/awayName`] = awayName;
+      updates[`matches/${gameId}/round`] = round;
+      updates[`matches/${gameId}/group`] = group;
+      updates[`matches/${gameId}/location`] = location;
+      updates[`matches/${gameId}/locationCity`] = locationCity;
+      updates[`matches/${gameId}/locationCountry`] = locationCountry;
+      updates[`matches/${gameId}/date`] = item.Date;
+      updates[`matches/${gameId}/timestamp`] = timestamp;
+    }
+
+    await db.ref().update(updates);
+    logger.info(`Refreshed metadata for ${data.Results.length} matches`);
+  } catch (error) {
+    logger.error('Error refreshing match data:', error);
+  }
+});
