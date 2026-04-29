@@ -8,4 +8,5 @@ export { LeagueDetail } from './LeagueDetail';
 export { Leagues } from './Leagues';
 export { NewLeague } from './NewLeague';
 export { Rules } from './Rules';
+export { Standings } from './Standings';
 export { UserProfile } from './UserProfile';

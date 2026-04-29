@@ -56,6 +56,11 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
     return idx >= 0 ? idx + 1 : null;
   }, [user, allUsers, selectedLeague, leagueMemberIds]);
 
+  const currentLeaderboardUser = React.useMemo(() => {
+    if (!user) return null;
+    return allUsers.find((u) => u.id === user.uid) ?? null;
+  }, [user, allUsers]);
+
   // Navigate to user profile after sign-in
   React.useEffect(() => {
     if (justSignedIn.current && userData?.userName) {
@@ -141,7 +146,11 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
               className="border-0 rounded-lg"
             />
             {[
-              { label: 'Puntos', value: userData.score, show: true },
+              {
+                label: 'Puntos',
+                value: currentLeaderboardUser?.score ?? userData.score,
+                show: true,
+              },
               {
                 label: 'Posición',
                 value: getPositionCompact(position!),
@@ -226,7 +235,16 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
                       onClick={closeMenu}
                       className={menuItemClass}
                     >
-                      <span>🥇</span> Clasificación
+                      <span>🥇</span> Podio
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/standings"
+                      onClick={closeMenu}
+                      className={menuItemClass}
+                    >
+                      <span>#</span> Tabla de posiciones
                     </Link>
                   </li>
                   {/* <li>

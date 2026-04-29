@@ -36,7 +36,12 @@ export const ProfilePicture = ({
 
   return (
     <div
-      className={`${container} rounded-full bg-blue-600 flex items-center justify-center ${text} font-bold ${className}`}
+      className={`${container} rounded-full flex items-center justify-center ${text} font-bold ${className}`}
+      style={{
+        background:
+          'linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-accent) 100%)',
+        color: 'var(--brand-ink)',
+      }}
     >
       {initial}
     </div>

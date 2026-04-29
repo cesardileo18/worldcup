@@ -5,13 +5,21 @@ import {
   MatchesByGroup,
   MatchesHeader,
 } from '../components';
-import { useMatches } from '../hooks';
+import { useAuth, useMatches } from '../hooks';
+import {
+  subscribeToPredictions,
+  type UserPredictions,
+} from '../services';
+import { isMockModeEnabled } from '../utils';
 
 type ViewMode = 'day' | 'group';
 
 export const Home = () => {
   const { matches, loading, error } = useMatches();
+  const { user } = useAuth();
   const [viewMode, setViewMode] = React.useState<ViewMode>('day');
+  const [predictions, setPredictions] = React.useState<UserPredictions>({});
+  const mockMode = isMockModeEnabled();
 
   // Hide splash once data is loaded
   React.useEffect(() => {
@@ -19,6 +27,16 @@ export const Home = () => {
       window.hideSplash?.();
     }
   }, [loading, matches, error]);
+
+  React.useEffect(() => {
+    if (!mockMode || !user) {
+      setPredictions({});
+      return;
+    }
+
+    const unsubscribe = subscribeToPredictions(user.uid, setPredictions);
+    return () => unsubscribe();
+  }, [mockMode, user]);
 
   return (
     <AppLayout>
@@ -36,9 +54,19 @@ export const Home = () => {
 
         {matches &&
           (viewMode === 'day' ? (
-            <MatchesByDay matches={matches} />
+            <MatchesByDay
+              matches={matches}
+              isOwnProfile={mockMode && !!user}
+              userId={user?.uid}
+              predictions={predictions}
+            />
           ) : (
-            <MatchesByGroup matches={matches} />
+            <MatchesByGroup
+              matches={matches}
+              isOwnProfile={mockMode && !!user}
+              userId={user?.uid}
+              predictions={predictions}
+            />
           ))}
       </div>
     </AppLayout>

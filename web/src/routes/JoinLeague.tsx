@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { signInWithDomainCheck, UnauthorizedDomainError } from '../firebase';
-import { bgImage, worldcupLogo } from '../assets';
+import { bgImage } from '../assets';
 import { AppLayout, Button, Card, LeaguePicture } from '../components';
 import { useAuth, useLeague } from '../hooks';
 import {
@@ -187,13 +187,18 @@ export const JoinLeague = () => {
           {/* App header */}
           <div className="flex items-center gap-3 mb-6">
             <img
-              src={worldcupLogo}
-              alt="Copa Mundial FIFA 2026"
-              className="h-12"
+              src="/iqfutbol.png"
+              alt="IQ Futbol"
+              className="h-14 w-14 object-contain"
             />
-            <span className="text-white font-light text-lg">
-              FIFA POOL 2026
-            </span>
+            <div className="flex flex-col">
+              <span className="text-white font-light text-lg">IQ Futbol</span>
+              <img
+                src="/DataIQ-Logo1.png"
+                alt="DataIQ"
+                className="h-4 w-fit opacity-80"
+              />
+            </div>
           </div>
 
           <Card className="p-8 text-center max-w-md w-full">

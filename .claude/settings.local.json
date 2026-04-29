@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "mcp__filesystem__directory_tree"
+      "mcp__filesystem__directory_tree",
+      "Bash(node scripts/download-flags.mjs)",
+      "Bash(rm CZE.png BIH.png TUR.png SWE.png IRQ.png COD.png)",
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\);[''CZE'',''BIH'',''TUR'',''SWE'',''IRQ'',''COD''].forEach\\(a=>{const b=fs.readFileSync\\(a+''.png''\\);console.log\\(a,b.length,''bytes'',b.slice\\(0,4\\).toString\\(''hex''\\)\\)}\\)\")"
     ]
   }
 }

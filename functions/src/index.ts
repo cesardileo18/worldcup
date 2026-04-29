@@ -15,6 +15,7 @@ interface Match {
   fifaId: string;
   homeScore: number;
   awayScore: number;
+  timestamp: number;
 }
 
 interface Prediction {
@@ -55,7 +56,7 @@ const getWinner = (home: number, away: number): 'home' | 'away' | 'tied' => {
 /**
  * Calculate points for a prediction
  * - 15 points: Exact score
- * - Up to 10 points: Correct winner, minus difference from actual score (min 0)
+ * - Up to 10 points: Correct winner, minus difference from actual score (min 1)
  * - 0 points: Wrong winner or no prediction
  */
 const calculatePoints = (
@@ -74,14 +75,78 @@ const calculatePoints = (
     return 15;
   }
 
-  // Correct winner: 10 points minus difference (min 0)
+  // Correct winner: 10 points minus difference (min 1)
   if (getWinner(homeScore, awayScore) === getWinner(homePrediction, awayPrediction)) {
     const difference = Math.abs(homePrediction - homeScore) + Math.abs(awayPrediction - awayScore);
-    return Math.max(0, 10 - difference);
+    return Math.max(1, 10 - difference);
   }
 
   // Wrong winner: 0 points
   return 0;
+};
+
+const isCorrectResult = (
+  homeScore: number,
+  awayScore: number,
+  homePrediction: number | null,
+  awayPrediction: number | null
+): boolean => {
+  if (homeScore < 0 || awayScore < 0 || homePrediction === null || awayPrediction === null) {
+    return false;
+  }
+
+  return getWinner(homeScore, awayScore) === getWinner(homePrediction, awayPrediction);
+};
+
+// Rule added 2026-04-13: streak bonus for testing.
+// Adds 2 extra points each time a user gets two played matches right in a row.
+// A streak of 3 correct results gives +4 total bonus: match 1+2, then match 2+3.
+const calculateStreakBonus = (
+  matches: Record<string, Match>,
+  userPredictions: Record<string, Prediction>
+): number => {
+  const playedMatches = Object.entries(matches)
+    .filter(([, match]) => match.homeScore >= 0 && match.awayScore >= 0)
+    .sort(([, a], [, b]) => a.timestamp - b.timestamp);
+
+  let bonus = 0;
+  let previousWasCorrect = false;
+
+  for (const [matchId, match] of playedMatches) {
+    const prediction = userPredictions[matchId];
+    const currentIsCorrect =
+      !!prediction &&
+      isCorrectResult(
+        match.homeScore,
+        match.awayScore,
+        prediction.homePrediction,
+        prediction.awayPrediction
+      );
+
+    if (previousWasCorrect && currentIsCorrect) {
+      bonus += 2;
+    }
+
+    previousWasCorrect = currentIsCorrect;
+  }
+
+  return bonus;
+};
+
+const calculateUserScore = (
+  matches: Record<string, Match>,
+  userPredictions: Record<string, Prediction> | null
+): number => {
+  if (!userPredictions) {
+    return 0;
+  }
+
+  const baseScore = Object.values(userPredictions).reduce(
+    (total, prediction) => total + (prediction.points ?? 0),
+    0
+  );
+
+  return baseScore + calculateStreakBonus(matches, userPredictions);
 };
 
 /**
@@ -228,16 +293,25 @@ export const updateUserScore = onValueWritten(
       return;
     }
 
-    const pointsDiff = afterPoints - beforePoints;
-
-    logger.info(`User ${userId} points changed: ${beforePoints} -> ${afterPoints} (diff: ${pointsDiff})`);
+    logger.info(`User ${userId} points changed: ${beforePoints} -> ${afterPoints}`);
 
     try {
-      // Use transaction to avoid race conditions
-      await db.ref(`users/${userId}/score`).transaction((current) => {
-        return (current ?? 0) + pointsDiff;
-      });
-      logger.info(`User ${userId} score updated with diff: ${pointsDiff}`);
+      const [matchesSnapshot, predictionsSnapshot] = await Promise.all([
+        db.ref('matches').once('value'),
+        db.ref(`predictions/${userId}`).once('value'),
+      ]);
+
+      const matches = matchesSnapshot.val() as Record<string, Match> | null;
+      const userPredictions = predictionsSnapshot.val() as Record<string, Prediction> | null;
+
+      if (!matches) {
+        logger.warn('No matches found while updating user score');
+        return;
+      }
+
+      const score = calculateUserScore(matches, userPredictions);
+      await db.ref(`users/${userId}/score`).set(score);
+      logger.info(`User ${userId} score recalculated: ${score}`);
     } catch (error) {
       logger.error('Error updating user score:', error);
     }

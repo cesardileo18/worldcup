@@ -1,4 +1,4 @@
-# FIFA Pool 2026
+# FIFA Prode 2026
 
 Aplicación web de pronósticos para el Mundial de la FIFA 2026. Construida con React, TypeScript y Firebase.
 

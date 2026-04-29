@@ -5,9 +5,9 @@ import { ToastContext, type Toast, type ToastVariant } from './ToastContext';
 const TOAST_DURATION = 3000;
 
 const variantBorders: Record<ToastVariant, string> = {
-  success: 'border-emerald-500/70',
-  error: 'border-red-500/70',
-  info: 'border-white/30',
+  success: 'border-[rgba(0,217,121,0.7)]',
+  error: 'border-[rgba(255,93,115,0.7)]',
+  info: 'border-[rgba(167,226,255,0.45)]',
 };
 
 const variantIcons: Record<ToastVariant, string> = {

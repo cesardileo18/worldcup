@@ -1,5 +1,6 @@
 import React from 'react';
 import { type Match, type Prediction, savePrediction } from '../../services';
+import { calculatePredictionPoints, isMockModeEnabled } from '../../utils';
 import { Card } from '../ui/Card';
 
 // Import all flags dynamically
@@ -28,6 +29,7 @@ export const MatchCard = ({
   userId,
   prediction,
 }: MatchCardProps) => {
+  const useMockMatches = isMockModeEnabled();
   const matchDate = new Date(match.date);
   const timeString = matchDate.toLocaleTimeString([], {
     hour: '2-digit',
@@ -43,7 +45,8 @@ export const MatchCard = ({
   const matchEndEstimate = kickoffTime + 150 * 60 * 1000; // 2.5 hours after kickoff
   const isLive =
     !isPlayed && Date.now() >= kickoffTime && Date.now() < matchEndEstimate;
-  const canPredict = isOwnProfile && userId && !predictionsClosed;
+  const canPredict =
+    isOwnProfile && userId && (!predictionsClosed || useMockMatches);
 
   const [homePrediction, setHomePrediction] = React.useState<string>(
     prediction?.homePrediction?.toString() ?? ''
@@ -86,17 +89,26 @@ export const MatchCard = ({
   };
 
   const inputClass =
-    'w-10 h-8 text-center bg-white/10 border border-white/20 rounded text-white text-lg font-bold focus:outline-none focus:border-white/40 disabled:opacity-50';
+    'w-10 h-8 text-center rounded text-white text-lg font-bold focus:outline-none disabled:opacity-50';
   const scoreClass =
     'w-10 h-8 flex items-center justify-center text-lg font-bold';
   const predictionClass =
-    'w-10 h-8 flex items-center justify-center bg-blue-600/30 border border-blue-400/30 rounded text-lg font-bold';
+    'w-10 h-8 flex items-center justify-center rounded text-lg font-bold';
 
   const dateString = matchDate.toLocaleDateString('es-ES', {
     month: 'short',
     day: 'numeric',
   });
 
+  const points =
+    prediction && useMockMatches
+      ? calculatePredictionPoints(
+          match.homeScore,
+          match.awayScore,
+          prediction.homePrediction,
+          prediction.awayPrediction
+        )
+      : (prediction?.points ?? 0);
   const showPoints = isPlayed && prediction;
 
   return (
@@ -139,10 +151,21 @@ export const MatchCard = ({
                 autoCapitalize="off"
                 spellCheck={false}
                 data-form-type="other"
+                style={{
+                  backgroundColor: 'rgba(227, 238, 232, 0.08)',
+                  border: '1px solid var(--app-border)',
+                }}
               />
             )}
             {!canPredict && prediction && (
-              <span className={predictionClass}>
+              <span
+                className={predictionClass}
+                style={{
+                  backgroundColor: 'rgba(0, 217, 121, 0.16)',
+                  border: '1px solid rgba(0, 217, 121, 0.28)',
+                  color: 'var(--brand-paper)',
+                }}
+              >
                 {prediction.homePrediction}
               </span>
             )}
@@ -182,10 +205,21 @@ export const MatchCard = ({
                 autoCapitalize="off"
                 spellCheck={false}
                 data-form-type="other"
+                style={{
+                  backgroundColor: 'rgba(227, 238, 232, 0.08)',
+                  border: '1px solid var(--app-border)',
+                }}
               />
             )}
             {!canPredict && prediction && (
-              <span className={predictionClass}>
+              <span
+                className={predictionClass}
+                style={{
+                  backgroundColor: 'rgba(0, 217, 121, 0.16)',
+                  border: '1px solid rgba(0, 217, 121, 0.28)',
+                  color: 'var(--brand-paper)',
+                }}
+              >
                 {prediction.awayPrediction}
               </span>
             )}
@@ -195,29 +229,34 @@ export const MatchCard = ({
         {/* Points Column */}
         {showPoints && (
           <div
-            className={`flex flex-col items-center border rounded-lg w-14 ${
-              prediction.points > 0
-                ? 'border-green-500/20 bg-green-600/10'
-                : 'border-red-500/20 bg-red-600/10'
-            }`}
+            className="flex flex-col items-center border rounded-lg w-14"
+            style={{
+              borderColor:
+                points > 0
+                  ? 'rgba(0, 217, 121, 0.28)'
+                  : 'rgba(255, 93, 115, 0.3)',
+              backgroundColor:
+                points > 0
+                  ? 'rgba(0, 217, 121, 0.12)'
+                  : 'rgba(255, 93, 115, 0.12)',
+            }}
           >
             <span className="flex-1 flex items-center text-2xl">
-              {prediction.points === 15
+              {points === 15
                 ? '🥳'
-                : prediction.points > 0
+                : points > 0
                   ? '😄'
                   : '😔'}
             </span>
             <span
-              className={`flex items-center justify-center text-xs px-1 py-0.5 w-14 rounded-b ${
-                prediction.points > 0
-                  ? 'bg-green-800 text-white'
-                  : 'bg-red-800 text-white'
-              }`}
+              className="flex items-center justify-center text-xs px-1 py-0.5 w-14 rounded-b text-white"
+              style={{
+                backgroundColor:
+                  points > 0 ? 'var(--brand-deep)' : 'var(--brand-danger)',
+                color: points > 0 ? 'var(--brand-paper)' : 'var(--brand-ink)',
+              }}
             >
-              {prediction.points > 0
-                ? `+${prediction.points}`
-                : prediction.points}{' '}
+              {points > 0 ? `+${points}` : points}{' '}
               pts
             </span>
           </div>

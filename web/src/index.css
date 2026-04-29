@@ -1,1 +1,36 @@
 @import 'tailwindcss';
+
+:root {
+  --brand-ink: #002b37;
+  --brand-deep: #00574a;
+  --brand-accent: #00d979;
+  --brand-paper: #f9f9f9;
+  --brand-surface: #e3eee8;
+  --brand-danger: #ff5d73;
+  --brand-info: #a7e2ff;
+  --brand-note: #b184ff;
+  --app-bg: #02171d;
+  --app-panel: rgba(0, 43, 55, 0.72);
+  --app-panel-strong: rgba(0, 43, 55, 0.88);
+  --app-panel-soft: rgba(0, 87, 74, 0.24);
+  --app-border: rgba(227, 238, 232, 0.16);
+  --app-border-strong: rgba(0, 217, 121, 0.35);
+  --app-text-muted: rgba(249, 249, 249, 0.68);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-family: inherit;
+}
+
+body {
+  font-family: inherit;
+  background:
+    radial-gradient(circle at top, rgba(0, 217, 121, 0.12), transparent 28%),
+    linear-gradient(180deg, var(--brand-ink) 0%, var(--app-bg) 100%);
+  color: var(--brand-paper);
+}

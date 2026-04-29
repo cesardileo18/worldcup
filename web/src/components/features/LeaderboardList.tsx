@@ -162,7 +162,7 @@ export const LeaderboardList = ({
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="w-full flex items-center justify-between text-white/70 text-xs font-medium uppercase tracking-wider hover:text-white transition-colors"
             >
-              {selectedLeague ? selectedLeague.name : 'Clasificación'}
+              {selectedLeague ? selectedLeague.name : 'Podio'}
               <span
                 className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
               >
@@ -187,7 +187,7 @@ export const LeaderboardList = ({
                       alt="Global"
                       className="w-10 h-10 rounded-xl object-cover"
                     />
-                    <span className="flex-1 truncate">FIFA POOL 2026</span>
+                    <span className="flex-1 truncate">FIFA PRODE 2026</span>
                     {!selectedLeague && <span className="ml-auto">✓</span>}
                   </button>
                 </li>
@@ -221,7 +221,7 @@ export const LeaderboardList = ({
           </div>
         ) : (
           <h3 className="text-white/70 text-xs font-medium uppercase tracking-wider mb-2 px-4">
-            Clasificación
+            Podio
           </h3>
         ))}
       {/* Podium for full variant */}
@@ -238,7 +238,7 @@ export const LeaderboardList = ({
           <div
             ref={scrollRef}
             onScroll={handleScroll}
-            className="flex flex-col overflow-y-auto h-full gap-y-2 px-2 pb-6"
+            className="flex flex-col overflow-y-auto h-full gap-y-1 px-2 pb-4"
           >
             {users.map((user, index) => (
               <UserRow

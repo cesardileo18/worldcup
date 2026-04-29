@@ -1,7 +1,15 @@
 import React from 'react';
 import { ref, onValue } from 'firebase/database';
 import { db } from '../firebase';
+import {
+  areMockResultsVisible,
+  getMockMatchesForCurrentState,
+  hideMockResults,
+  mockResultsEvent,
+  revealMockResults,
+} from '../mock/mockModeState';
 import { fetchMatches, type MatchesData } from '../services/matchService';
+import { isMockModeEnabled } from '../utils';
 import { MatchContext } from './MatchContext';
 
 export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -10,12 +18,27 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [matches, setMatches] = React.useState<MatchesData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [mockResultsVisible, setMockResultsVisible] = React.useState(() =>
+    isMockModeEnabled() && areMockResultsVisible()
+  );
   const fetchAttemptedRef = React.useRef(false);
 
   React.useEffect(() => {
+    if (isMockModeEnabled()) {
+      const syncMockMatches = () => {
+        setMatches(getMockMatchesForCurrentState());
+        setMockResultsVisible(areMockResultsVisible());
+        setLoading(false);
+        setError(null);
+      };
+
+      syncMockMatches();
+      window.addEventListener(mockResultsEvent, syncMockMatches);
+      return () => window.removeEventListener(mockResultsEvent, syncMockMatches);
+    }
+
     const matchesRef = ref(db, 'matches');
 
-    // Set up real-time listener
     const unsubscribe = onValue(
       matchesRef,
       (snapshot) => {
@@ -23,7 +46,6 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
           setMatches(snapshot.val() as MatchesData);
           setLoading(false);
         } else if (!fetchAttemptedRef.current) {
-          // No matches exist and we haven't tried fetching yet
           fetchAttemptedRef.current = true;
           fetchMatches()
             .then((data) => {
@@ -39,7 +61,6 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
               setLoading(false);
             });
         } else {
-          // Already attempted fetch, just stop loading
           setLoading(false);
         }
       },
@@ -57,6 +78,9 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({
     matches,
     loading,
     error,
+    revealMockResults,
+    resetMockResults: hideMockResults,
+    mockResultsVisible,
   };
 
   return <MatchContext value={value}>{children}</MatchContext>;

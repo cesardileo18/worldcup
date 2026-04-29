@@ -29,6 +29,8 @@
 
     // Predictions - anyone can read, users can only write their own (admins can write any)
     "predictions": {
+      // Parent read is needed for the standings table to calculate every user's detail.
+      ".read": true,
       "$userId": {
         // Anyone can read predictions (to view other users' predictions)
         ".read": true,
@@ -50,6 +52,29 @@
           "points": {
             // Users can only set points to 0, admins/functions can set any value
             ".validate": "newData.isNumber() && newData.val() >= 0 && (newData.val() === 0 || root.child('users').child(auth.uid).child('admin').val() === true)"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    },
+
+    // Mock predictions - shared test data used only by the hosted mock mode
+    "mockPredictions": {
+      ".read": "auth != null",
+      "$userId": {
+        "$gameId": {
+          ".write": "auth != null && auth.uid === $userId",
+          ".validate": "newData.hasChildren(['homePrediction', 'awayPrediction', 'points', 'updatedAt'])",
+          "homePrediction": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
+          },
+          "awayPrediction": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99"
+          },
+          "points": {
+            ".validate": "newData.isNumber() && newData.val() === 0"
           },
           "updatedAt": {
             ".validate": "newData.isNumber()"

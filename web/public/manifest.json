@@ -1,7 +1,7 @@
 {
-  "name": "World Cup 2026 Pool",
-  "short_name": "WC 2026 Pool",
-  "description": "FIFA World Cup 2026 Prediction Pool",
+  "name": "FIFA Prode 2026",
+  "short_name": "Prode 2026",
+  "description": "Prode del Mundial FIFA 2026",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -15,4 +15,3 @@
     }
   ]
 }
-

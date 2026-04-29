@@ -1,5 +1,5 @@
 import { AppLayout, Card } from '../components';
-import { createdByPic, worldcupLogo } from '../assets';
+import { createdByPic } from '../assets';
 
 export const About = () => {
   return (
@@ -10,10 +10,21 @@ export const About = () => {
             {/* Project Description */}
             <div className="mb-6">
               <div className="flex flex-row items-center justify-center gap-4 mb-8 mt-4">
-                <img src={worldcupLogo} alt="Mundial 2026" className="h-16" />
-                <h2 className="md:text-2xl text-lg font-semibold text-white">
-                  FIFA POOL 2026
-                </h2>
+                <img
+                  src="/iqfutbol.png"
+                  alt="IQ Futbol"
+                  className="h-16 w-16 object-contain"
+                />
+                <div className="flex flex-col items-start">
+                  <h2 className="md:text-2xl text-lg font-semibold text-white">
+                    IQ Futbol
+                  </h2>
+                  <img
+                    src="/DataIQ-Logo1.png"
+                    alt="DataIQ"
+                    className="h-4 w-fit opacity-80"
+                  />
+                </div>
               </div>
               <p className="text-white/80">
                 Un juego de pronósticos del Mundial FIFA 2026 divertido y competitivo. Adivina los marcadores, desafía a tus amigos y familiares, y sube en la clasificación para presumir.

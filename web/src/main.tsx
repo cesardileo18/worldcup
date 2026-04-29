@@ -15,6 +15,7 @@ import {
   Leagues,
   NewLeague,
   Rules,
+  Standings,
   UserProfile,
 } from './routes';
 
@@ -45,6 +46,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/" element={<Home />} />
                 {/* <Route path="/about" element={<About />} /> */}
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/standings" element={<Standings />} />
                 <Route path="/rules" element={<Rules />} />
                 <Route path="/leagues" element={<Leagues />} />
                 <Route

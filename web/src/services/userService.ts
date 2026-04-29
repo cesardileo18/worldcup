@@ -15,6 +15,13 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import type { User } from 'firebase/auth';
+import {
+  calculateMockUserScore,
+  mockPredictionsPath,
+  type MockPredictionsByUser,
+} from '../mock/mockPredictionStore';
+import { mockResultsEvent } from '../mock/mockModeState';
+import { isMockModeEnabled } from '../utils';
 
 export interface UserData {
   email: string;
@@ -108,7 +115,19 @@ export const handleUserLogin = async (user: User) => {
     return userData;
   }
 
-  return snapshot.val() as UserData;
+  const existingUser = snapshot.val() as UserData;
+  const normalizedExistingUsername = normalizeUsername(existingUser.userName);
+
+  if (normalizedExistingUsername) {
+    const usernameRef = ref(db, `usernames/${normalizedExistingUsername}`);
+    const usernameSnapshot = await get(usernameRef);
+
+    if (!usernameSnapshot.exists()) {
+      await set(usernameRef, user.uid);
+    }
+  }
+
+  return existingUser;
 };
 
 /**
@@ -200,7 +219,25 @@ export const getUserByUsername = async (
   const usernameRef = ref(db, `usernames/${normalized}`);
   const snapshot = await get(usernameRef);
 
-  if (!snapshot.exists()) return null;
+  if (!snapshot.exists()) {
+    const usersSnapshot = await get(ref(db, 'users'));
+    if (!usersSnapshot.exists()) return null;
+
+    const users = usersSnapshot.val() as Record<string, UserData>;
+    const foundUser = Object.entries(users).find(
+      ([, data]) => normalizeUsername(data.userName) === normalized
+    );
+
+    if (!foundUser) return null;
+
+    const [foundUserId, foundUserData] = foundUser;
+    await set(usernameRef, foundUserId);
+
+    return {
+      id: foundUserId,
+      data: foundUserData,
+    };
+  }
 
   const userId = snapshot.val() as string;
   const userRef = ref(db, `users/${userId}`);
@@ -257,21 +294,54 @@ export const subscribeToLeaderboard = (
   callback: (users: UserWithId[]) => void
 ): (() => void) => {
   const usersRef = ref(db, 'users');
+  let latestUsers: UserWithId[] = [];
+  let latestMockPredictions: MockPredictionsByUser = {};
+
+  const emitUsers = (users: UserWithId[]) => {
+    const decoratedUsers = isMockModeEnabled()
+      ? users.map((user) => ({
+          ...user,
+          score: calculateMockUserScore(latestMockPredictions[user.id]),
+        }))
+      : users;
+
+    decoratedUsers.sort((a, b) => b.score - a.score);
+    callback(decoratedUsers);
+  };
+
   const unsubscribe = onValue(usersRef, (snapshot) => {
     const data = snapshot.val() as Record<string, UserData> | null;
     if (!data) {
       callback([]);
       return;
     }
-    const users: UserWithId[] = Object.entries(data).map(([id, user]) => ({
+    latestUsers = Object.entries(data).map(([id, user]) => ({
       id,
       ...user,
     }));
-    // Sort by score descending
-    users.sort((a, b) => b.score - a.score);
-    callback(users);
+    emitUsers(latestUsers);
   });
-  return unsubscribe;
+
+  if (!isMockModeEnabled()) {
+    return unsubscribe;
+  }
+
+  const mockPredictionsRef = ref(db, mockPredictionsPath);
+  const unsubscribeMockPredictions = onValue(mockPredictionsRef, (snapshot) => {
+    latestMockPredictions = snapshot.exists()
+      ? (snapshot.val() as MockPredictionsByUser)
+      : {};
+    emitUsers(latestUsers);
+  });
+  const handleMockResultsUpdated = () => emitUsers(latestUsers);
+
+  window.addEventListener(mockResultsEvent, handleMockResultsUpdated);
+
+  return () => {
+    unsubscribe();
+    unsubscribeMockPredictions();
+    window.removeEventListener(mockResultsEvent, handleMockResultsUpdated);
+  };
 };
 
 /**

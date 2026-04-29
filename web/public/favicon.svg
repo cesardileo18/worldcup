@@ -1,11 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text
-    x="50"
-    y="50"
-    text-anchor="middle"
-    dominant-baseline="central"
-    font-size="80"
-  >
-    ⚽
-  </text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DataIQ">
+  <rect width="64" height="64" rx="12" fill="#00D979" />
+  <path
+    d="M18 18h7v28h-7V18Zm12 0h7v28h-7V18Zm11 0h7c6.075 0 11 4.925 11 11v6c0 4.276-2.44 7.982-6 9.805V50h-7v-4h-5V18Zm7 7v14c2.209 0 4-1.791 4-4v-6c0-2.209-1.791-4-4-4Z"
+    fill="#002B37"
+  />
 </svg>

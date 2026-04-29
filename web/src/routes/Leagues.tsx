@@ -156,7 +156,7 @@ export const Leagues = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold text-white truncate">
-                      FIFA POOL 2026
+                      FIFA PRODE 2026
                     </h3>
                     <p className="text-white/50 text-sm">Clasificación global</p>
                   </div>
