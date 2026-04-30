@@ -17,7 +17,7 @@ Accedé en vivo desde **[worldcup-2026.web.app](https://worldcup-2026.web.app/)*
 - Tabla de clasificación global y por liga privada
 - Creación y unión a ligas privadas con link de invitación
 - PWA instalable en mobile
-- Sistema de puntos: marcador exacto (15 pts), resultado correcto (hasta 10 pts), resultado incorrecto (0 pts)
+- Sistema de puntos: marcador exacto (10 pts), ganador con un marcador exacto (8 pts), ganador/empate correcto (6 pts), incorrecto (0 pts)
 - Cierre de pronósticos: 10 minutos antes del inicio del partido
 - Indicador de partido EN VIVO en el MatchCard
 - Navegación adaptada por dispositivo: sidebar en desktop, bottom nav en mobile
@@ -147,16 +147,28 @@ predictions/{userId}/{fifaMatchId} → { homePrediction, awayPrediction, points 
 
 El trigger `updatePredictionPoints` recibe el `matchId` directamente del path de Firebase y accede a las predicciones sin ningún mapeo adicional.
 
-### Actualización de scores (Cloud Function)
+### Actualización de scores (Cloud Functions)
 
-La función `updateMatchScores` corre cada 1 minuto (cron). Consulta la FIFA API para los partidos del día actual y actualiza en Firebase solo los scores que cambiaron. El frontend recibe los cambios en tiempo real mediante el listener `onValue` de Firebase.
+La app usa la FIFA API como fuente de partidos y resultados. Como la API no expone un push/webhook publico documentado para goles en vivo, el backend hace polling inteligente.
+
+Horarios y ventanas se manejan con `timestamp` Unix. Para consultar el dia correcto se usa la zona horaria de Argentina: `America/Argentina/Buenos_Aires`.
+
+- `updateMatchScores` corre cada 1 minuto.
+- Si no hay partidos cercanos o activos, no consulta FIFA y termina.
+- Si hay un partido en ventana activa, consulta FIFA cada minuto.
+- Ventana activa: desde 15 minutos antes del kickoff hasta 3 horas despues del inicio.
+- `morningScoreRefresh` consulta FIFA todos los dias a las 06:00 Argentina.
+- `finalDailyScoreRefresh` consulta FIFA todos los dias a las 23:59 Argentina.
+- `refreshMatchData` refresca metadata todos los dias a las 06:00 Argentina.
+
+Esto cubre partidos temprano, partidos de madrugada, partidos del dia y una consulta final al cierre del dia. El frontend recibe los cambios en tiempo real mediante listeners `onValue` de Firebase.
 
 ### Diagrama de flujo
 
 ```
-FIFA API (cada 1 min)
+FIFA API (polling inteligente)
     ↓
-updateMatchScores (Cloud Function)
+updateMatchScores / morningScoreRefresh / finalDailyScoreRefresh
     ↓
 Firebase matches/{fifaId}/homeScore, awayScore
     ↓
@@ -177,15 +189,22 @@ Frontend (listener en tiempo real) → re-render automático
 
 | Función | Trigger | Descripción |
 |---|---|---|
-| `updateMatchScores` | Cron cada 1 minuto | Consulta FIFA API y actualiza scores del día |
+| `updateMatchScores` | Cron cada 1 minuto | Consulta FIFA solo si hay partidos en ventana activa |
+| `morningScoreRefresh` | Cron 06:00 Argentina | Consulta forzada de scores del dia |
+| `finalDailyScoreRefresh` | Cron 23:59 Argentina | Consulta final forzada de scores del dia |
+| `refreshMatchData` | Cron 06:00 Argentina | Refresca equipos, grupos, estadios, fechas y metadata |
 | `updatePredictionPoints` | `onValueWritten: matches/{matchId}` | Recalcula puntos de todos los usuarios para ese partido |
 | `updateUserScore` | `onValueWritten: predictions/{userId}/{matchId}/points` | Actualiza el puntaje total del usuario con transacción |
+| `recalculateScores` | Callable admin | Recalcula todos los puntos y scores existentes con la regla vigente |
 
 ### Sistema de puntos
 
-- **15 pts** → Marcador exacto (ej: predijo 2-1, resultado 2-1)
-- **Hasta 10 pts** → Ganador correcto: `10 - |diferencia de goles|` (mínimo 0)
-- **0 pts** → Ganador incorrecto o sin pronóstico
+- **10 pts** -> Marcador exacto (ej: resultado 2-1, prediccion 2-1)
+- **8 pts** -> Ganador correcto y goles exactos de uno de los dos equipos (ej: resultado 2-1, prediccion 2-0 o 3-1)
+- **6 pts** -> Ganador correcto sin marcador exacto de ningun equipo (ej: resultado 2-1, prediccion 3-2)
+- **6 pts** -> Empate correcto no exacto (ej: resultado 0-0, prediccion 1-1)
+- **0 pts** -> Ganador incorrecto, empate incorrecto o sin pronostico
+- No hay bonus por racha.
 
 ---
 
