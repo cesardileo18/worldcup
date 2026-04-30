@@ -1,12 +1,11 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { bgImage } from '../../assets';
-import { useAuth, useLeague } from '../../hooks';
+import { useAuth } from '../../hooks';
 import { isMockModeEnabled } from '../../utils';
 // import { DevToolsPanel } from './DevToolsPanel';
-import { LeaguePicture } from './LeaguePicture';
+import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
-import { UserMenu } from './UserMenu';
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -15,10 +14,10 @@ type AppLayoutProps = {
 
 export const AppLayout = ({ children, className = '' }: AppLayoutProps) => {
   const { userData } = useAuth();
-  const { selectedLeague } = useLeague();
   const mockMode = isMockModeEnabled();
 
   const mobileNavItems = [
+    { to: '/', icon: '📅', label: 'Partidos' },
     {
       to: userData ? `/${userData.userName}` : '/',
       icon: '⚽',
@@ -58,60 +57,14 @@ export const AppLayout = ({ children, className = '' }: AppLayoutProps) => {
         />
       </div>
       {/* Layout container */}
-      <div className="flex min-h-screen overflow-x-hidden text-white">
-        {/* Desktop sidebar */}
-        <div className="hidden md:block">
-          <Sidebar />
-        </div>
+      <div className="flex min-h-screen flex-col overflow-x-hidden text-white">
+        <Navbar />
 
-        {/* Mobile header + content */}
-        <div className="flex-1 min-w-0 flex flex-col md:block">
-          {/* Mobile header */}
-          <header
-            className="md:hidden sticky top-0 z-20 backdrop-blur-lg px-4 py-0"
-            style={{
-              backgroundColor: 'var(--app-panel-strong)',
-              borderBottom: '1px solid var(--app-border)',
-              paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)',
-            }}
-          >
-            <div className="flex items-center justify-between pb-3">
-              <Link
-                to={selectedLeague ? `/league/${selectedLeague.slug}` : '/'}
-                className="flex items-center gap-2"
-              >
-                {selectedLeague ? (
-                  <>
-                    <LeaguePicture
-                      src={selectedLeague.imageURL}
-                      name={selectedLeague.name}
-                      size="sm"
-                    />
-                    <span className="text-white font-medium text-sm truncate max-w-48">
-                      {selectedLeague.name}
-                    </span>
-                  </>
-                ) : (
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <img
-                      src="/iqfutbol.png"
-                      alt="IQ Futbol"
-                      className="h-8 w-8 shrink-0 object-contain"
-                    />
-                    <div className="min-w-0 leading-none">
-                      <span className="block truncate text-sm font-semibold tracking-[0.01em] text-white">
-                        IQ Futbol
-                      </span>
-                      <span className="block truncate pt-1 text-[10px] font-medium uppercase tracking-[0.14em] text-white/55">
-                        Prode FIFA 2026
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </Link>
-              <UserMenu mobile />
-            </div>
-          </header>
+        <div className="flex flex-1 min-h-0">
+          {/* Desktop sidebar */}
+          <div className="hidden md:block">
+            <Sidebar />
+          </div>
 
           <main className={`flex-1 min-w-0 overflow-x-hidden pb-20 md:pb-0 ${className}`}>
             {mockMode && (
@@ -127,37 +80,37 @@ export const AppLayout = ({ children, className = '' }: AppLayoutProps) => {
             )}
             {children}
           </main>
-
-          {/* Mobile bottom navigation */}
-          <nav
-            className="md:hidden fixed bottom-0 left-0 right-0 z-20 backdrop-blur-lg"
-            style={{
-              backgroundColor: 'var(--app-panel-strong)',
-              borderTop: '1px solid var(--app-border)',
-              paddingBottom: 'env(safe-area-inset-bottom)',
-            }}
-          >
-            <div className="flex justify-around items-center py-2">
-              {mobileNavItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end
-                  className={({ isActive }) =>
-                    `flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-                      isActive
-                        ? 'text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`
-                  }
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span className="text-[10px]">{item.label}</span>
-                </NavLink>
-              ))}
-            </div>
-          </nav>
         </div>
+
+        {/* Mobile bottom navigation */}
+        <nav
+          className="md:hidden fixed bottom-0 left-0 right-0 z-20 backdrop-blur-lg"
+          style={{
+            backgroundColor: 'var(--app-panel-strong)',
+            borderTop: '1px solid var(--app-border)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          <div className="flex justify-around items-center py-2">
+            {mobileNavItems.map((item) => (
+              <NavLink
+                key={`${item.to}-${item.label}`}
+                to={item.to}
+                end
+                className={({ isActive }) =>
+                  `flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-white/50 hover:text-white/70'
+                  }`
+                }
+              >
+                <span className="text-xl">{item.icon}</span>
+                <span className="text-[10px]">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </nav>
       </div>
 
       {/* Dev Tools (only in dev mode for admins) */}

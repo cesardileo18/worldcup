@@ -107,7 +107,11 @@ export const UserProfile = () => {
               />
             )}
 
-            <MatchesHeader viewMode={viewMode} onViewModeChange={setViewMode} />
+            <MatchesHeader
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              showMobileMascot
+            />
 
             {error && (
               <div className="text-center text-red-400">Error: {error}</div>

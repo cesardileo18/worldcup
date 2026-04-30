@@ -1,118 +1,93 @@
-import { Link, NavLink } from 'react-router-dom';
-import { sidebarMenuBg } from '../../assets';
-import { useLeague } from '../../hooks';
+import { Link } from 'react-router-dom';
 import { Card } from '../ui/Card';
 import { LeaderboardList } from './LeaderboardList';
-import { LeaguePicture } from './LeaguePicture';
 import { UserMenu } from './UserMenu';
 
-export const Sidebar = () => {
-  const { selectedLeague } = useLeague();
+const sidebarDots = [
+  'left-[8%] top-[35%] h-1 w-1',
+  'left-[34%] top-[18%] h-1.5 w-1.5',
+  'left-[28%] top-[28%] h-0.5 w-0.5',
+  'left-[52%] top-[22%] h-1.5 w-1.5',
+  'left-[58%] top-[18%] h-1 w-1',
+  'left-[66%] top-[20%] h-1 w-1',
+  'left-[17%] top-[42%] h-1 w-1',
+  'left-[31%] top-[46%] h-1 w-1',
+  'left-[73%] top-[39%] h-1 w-1',
+  'left-[58%] top-[43%] h-1 w-1',
+  'left-[24%] top-[54%] h-0.5 w-0.5',
+  'left-[45%] top-[53%] h-0.5 w-0.5',
+  'left-[62%] top-[57%] h-0.5 w-0.5',
+  'left-[86%] top-[48%] h-1 w-1',
+  'left-[12%] top-[64%] h-0.5 w-0.5',
+  'left-[33%] top-[64%] h-0.5 w-0.5',
+  'left-[78%] top-[68%] h-0.5 w-0.5',
+  'left-[40%] top-[72%] h-2.5 w-2.5',
+  'left-[55%] top-[78%] h-1 w-1',
+  'left-[69%] top-[81%] h-1 w-1',
+  'left-[89%] top-[76%] h-0.5 w-0.5',
+];
 
+const sidebarRingDots = [
+  'left-[47%] top-[13%] h-2.5 w-2.5',
+  'left-[20%] top-[73%] h-3 w-3',
+  'left-[80%] top-[18%] h-2 w-2',
+];
+
+export const Sidebar = () => {
   return (
-    <aside className="w-80 shrink-0 p-3 h-screen sticky top-0">
-      <Card className="h-full max-h-[calc(100vh-2rem)] flex flex-col rounded-xl after:hidden overflow-hidden">
+    <aside className="w-80 shrink-0 p-2 h-[calc(100vh-76px)] sticky top-[76px]">
+      <Card className="h-full max-h-[calc(100vh-76px-1rem)] flex flex-col rounded-xl after:hidden overflow-hidden">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(0, 43, 55, 0.38), rgba(0, 87, 74, 0.2) 44%, rgba(0, 43, 55, 0.58) 100%)',
+          }}
+        />
         <div className="relative w-full shrink-0 flex flex-col overflow-hidden pb-1">
-          <img
-            src={sidebarMenuBg}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <Link
-            to={selectedLeague ? `/league/${selectedLeague.slug}` : '/'}
-            className="relative z-10 flex items-center justify-center py-3 hover:opacity-90 transition-opacity"
-          >
-            {selectedLeague ? (
-              <LeaguePicture
-                src={selectedLeague.imageURL}
-                name={selectedLeague.name}
-                size="xl"
-                className="h-24 w-24 drop-shadow-lg"
-              />
-            ) : (
-              <div className="flex flex-col items-center">
-                <img
-                  src="/iqfutbol.png"
-                  alt="IQ Futbol"
-                  className="h-28 w-28 object-contain drop-shadow-lg"
-                />
-              </div>
-            )}
-          </Link>
-          <div className="relative z-10 px-2 pb-2">
+          <div className="absolute inset-0 bg-linear-to-b from-[#002b37] via-[#003f42] to-[#002b37]" />
+          {sidebarDots.map((className) => (
+            <span
+              key={className}
+              className={`absolute rounded-full bg-white ${className}`}
+            />
+          ))}
+          {sidebarRingDots.map((className) => (
+            <span
+              key={className}
+              className={`absolute rounded-full border-2 border-white/80 ${className}`}
+            />
+          ))}
+          <div className="relative z-10 flex h-20 items-start justify-center px-6 pt-3">
+            <span className="rounded border border-white/15 bg-[#00574a]/35 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-white/90 backdrop-blur-sm">
+              Prode FIFA 2026
+            </span>
+          </div>
+          <div className="absolute left-1/2 top-14 z-0 h-8 w-36 -translate-x-1/2 bg-[#002b37]/25 blur-sm" />
+          <div className="relative z-10 px-2 pb-1">
             <UserMenu />
           </div>
         </div>
-        <div className="pt-3 flex-1 min-h-0 flex flex-col">
-          <div className="px-3 pb-3 flex gap-2 text-xs">
-            <NavLink
-              to="/leaderboard"
-              className={({ isActive }) =>
-                `flex-1 rounded-lg border px-3 py-2 text-center transition-colors ${
-                  isActive
-                    ? 'text-white'
-                    : 'text-white/55 hover:text-white'
-                }`
-              }
-              style={({ isActive }) => ({
-                borderColor: isActive
-                  ? 'rgba(0, 217, 121, 0.35)'
-                  : 'var(--app-border)',
-                backgroundColor: isActive
-                  ? 'rgba(0, 87, 74, 0.35)'
-                  : 'rgba(227, 238, 232, 0.04)',
-              })}
-            >
-              Podio
-            </NavLink>
-            <NavLink
-              to="/standings"
-              className={({ isActive }) =>
-                `flex-1 rounded-lg border px-3 py-2 text-center transition-colors ${
-                  isActive
-                    ? 'text-white'
-                    : 'text-white/55 hover:text-white'
-                }`
-              }
-              style={({ isActive }) => ({
-                borderColor: isActive
-                  ? 'rgba(0, 217, 121, 0.35)'
-                  : 'var(--app-border)',
-                backgroundColor: isActive
-                  ? 'rgba(0, 87, 74, 0.35)'
-                  : 'rgba(227, 238, 232, 0.04)',
-              })}
-            >
-              Tabla
-            </NavLink>
-          </div>
+        <div className="pt-1 flex-1 min-h-0 flex flex-col">
           <LeaderboardList />
         </div>
         {/* Footer Links */}
         <div
-          className="shrink-0 p-2"
+          className="shrink-0 px-3 py-1.5"
           style={{ borderTop: '1px solid var(--app-border)' }}
         >
-          <div className="mb-3 flex justify-center">
+          <div className="flex items-center justify-between gap-3 text-[11px]">
             <img
               src="/DataIQ-Logo1.png"
               alt="DataIQ"
-              className="h-5 w-auto opacity-80"
+              className="h-4 w-auto"
             />
-          </div>
-          <div className="flex gap-4 justify-center text-xs">
             <Link
               to="/rules"
-              className="text-white/50 hover:text-white transition-colors flex items-center gap-1"
+              className="text-white/50 hover:text-white transition-colors"
             >
               Reglas
             </Link>
-            {/* <Link
-              to="/about"
-              className="text-white/50 hover:text-white transition-colors flex items-center gap-1"
-            >
-              About
-            </Link> */}
           </div>
         </div>
       </Card>

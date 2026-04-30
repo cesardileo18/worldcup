@@ -1,4 +1,4 @@
-import { calculateTotalScoreWithStreakBonus } from '../utils/scoring';
+import { calculateTotalScore } from '../utils/scoring';
 import { mockMatches } from './mockMatches';
 import { areMockResultsVisible } from './mockModeState';
 
@@ -21,5 +21,5 @@ export const calculateMockUserScore = (
     return 0;
   }
 
-  return calculateTotalScoreWithStreakBonus(mockMatches, predictions);
+  return calculateTotalScore(mockMatches, predictions);
 };

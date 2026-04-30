@@ -1,7 +1,6 @@
 import type { Match, UserPredictions, UserWithId } from '../services';
 import {
   calculatePredictionPoints,
-  calculateStreakBonus,
   isCorrectResult,
 } from './scoring';
 
@@ -18,7 +17,6 @@ export type StandingRow = UserWithId & {
   position: number;
   exactCount: number;
   resultCount: number;
-  bonusPoints: number;
   playedPredictions: number;
   details: StandingMatchDetail[];
 };
@@ -87,15 +85,12 @@ export const buildStandingRows = (
         ];
       });
 
-    const bonusPoints = calculateStreakBonus(matches, userPredictions);
-
     return {
       ...user,
-      score: baseScore + bonusPoints,
+      score: baseScore,
       position: 0,
       exactCount,
       resultCount,
-      bonusPoints,
       playedPredictions,
       details,
     };

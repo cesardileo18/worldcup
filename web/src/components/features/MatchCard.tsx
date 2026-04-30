@@ -242,7 +242,7 @@ export const MatchCard = ({
             }}
           >
             <span className="flex-1 flex items-center text-2xl">
-              {points === 15
+              {points === 10
                 ? '🥳'
                 : points > 0
                   ? '😄'

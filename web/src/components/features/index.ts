@@ -6,9 +6,9 @@ export { MatchCard } from './MatchCard';
 export { MatchesByDay } from './MatchesByDay';
 export { MatchesByGroup } from './MatchesByGroup';
 export { MatchesHeader } from './MatchesHeader';
+export { Navbar } from './Navbar';
 export { Podium } from './Podium';
 export { ProtectedRoute } from './ProtectedRoute';
 export { Sidebar } from './Sidebar';
 export { UserHeader } from './UserHeader';
 export { UserMenu } from './UserMenu';
-

@@ -7,8 +7,7 @@ export {
 export { isMockModeEnabled } from './mockMode';
 export {
   calculatePredictionPoints,
-  calculateStreakBonus,
-  calculateTotalScoreWithStreakBonus,
+  calculateTotalScore,
   isCorrectResult,
 } from './scoring';
 export { buildStandingRows } from './standings';

@@ -41,7 +41,11 @@ export const Home = () => {
   return (
     <AppLayout>
       <div className="pt-8 px-4 pb-8 max-w-4xl mx-auto">
-        <MatchesHeader viewMode={viewMode} onViewModeChange={setViewMode} />
+        <MatchesHeader
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          showMobileMascot
+        />
 
         {/* Content */}
         {loading && (

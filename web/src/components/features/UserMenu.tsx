@@ -1,8 +1,12 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { signOut } from 'firebase/auth';
-import { useNavigate, Link } from 'react-router-dom';
-import { auth, signInWithDomainCheck, UnauthorizedDomainError } from '../../firebase';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  auth,
+  signInWithDomainCheck,
+  UnauthorizedDomainError,
+} from '../../firebase';
 import { sidebarMenuBg } from '../../assets';
 import { useAuth } from '../../hooks/useAuth';
 import { useLeague } from '../../hooks/useLeague';
@@ -31,7 +35,6 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
   const dropdownRef = React.useRef<HTMLUListElement>(null);
   const justSignedIn = React.useRef(false);
 
-  // Subscribe to leaderboard
   React.useEffect(() => {
     const unsubscribe = subscribeToLeaderboard((users) => {
       setAllUsers(users);
@@ -39,7 +42,6 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
     return () => unsubscribe();
   }, []);
 
-  // Calculate position based on selected league
   const position = React.useMemo(() => {
     if (!user) return null;
 
@@ -61,7 +63,6 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
     return allUsers.find((u) => u.id === user.uid) ?? null;
   }, [user, allUsers]);
 
-  // Navigate to user profile after sign-in
   React.useEffect(() => {
     if (justSignedIn.current && userData?.userName) {
       justSignedIn.current = false;
@@ -77,7 +78,6 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
       .catch(console.error);
   };
 
-  // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -95,7 +95,42 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  React.useEffect(() => {
+    if (!isOpen || mobile) return;
+
+    let frameId: number | null = null;
+    const updateDropdownPosition = () => {
+      if (frameId !== null) return;
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        if (buttonRef.current) {
+          setDropdownRect(buttonRef.current.getBoundingClientRect());
+        }
+      });
+    };
+
+    updateDropdownPosition();
+    window.addEventListener('scroll', updateDropdownPosition, true);
+    window.addEventListener('resize', updateDropdownPosition);
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+      window.removeEventListener('scroll', updateDropdownPosition, true);
+      window.removeEventListener('resize', updateDropdownPosition);
+    };
+  }, [isOpen, mobile]);
+
   const closeMenu = () => setIsOpen(false);
+
+  const toggleMenu = () => {
+    if (!isOpen && buttonRef.current) {
+      setDropdownRect(buttonRef.current.getBoundingClientRect());
+    }
+    setIsOpen((open) => !open);
+  };
 
   const handleSignIn = () => {
     setAuthError(null);
@@ -110,7 +145,6 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
     });
   };
 
-  // Show sign in button if not authenticated
   if (!user) {
     return (
       <div className="flex flex-col items-center gap-1">
@@ -119,23 +153,105 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
         </Button>
         {authError && (
           <div className="flex items-center gap-2 bg-red-600/90 border border-red-400 rounded-lg px-3 py-2 mt-1 w-full">
-            <span className="text-white text-base leading-none">⚠️</span>
+            <span className="text-white text-base leading-none">!</span>
             <p className="text-white text-xs font-semibold">{authError}</p>
           </div>
         )}
       </div>
     );
   }
+
+  const menuContent = (
+    <>
+      {!mobile && (
+        <>
+          <li>
+            <Link to="/" onClick={closeMenu} className={menuItemClass}>
+              <span>📅</span> Partidos
+            </Link>
+          </li>
+          <li>
+            <Link
+              to={`/${userData?.userName}`}
+              onClick={closeMenu}
+              className={menuItemClass}
+            >
+              <span>⚽</span> Mis pronosticos
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/leaderboard"
+              onClick={closeMenu}
+              className={menuItemClass}
+            >
+              <span>🥇</span> Podio
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/standings"
+              onClick={closeMenu}
+              className={menuItemClass}
+            >
+              <span>#</span> Tabla de posiciones
+            </Link>
+          </li>
+        </>
+      )}
+      <li>
+        <Link
+          to="/edit-profile"
+          onClick={closeMenu}
+          className={menuItemClass}
+        >
+          <span>✏️</span> Editar perfil
+        </Link>
+      </li>
+      <li className={dividerClass} />
+      {mobile && (
+        <>
+          <li>
+            <Link to="/rules" onClick={closeMenu} className={menuItemClass}>
+              <span>📋</span> Reglas
+            </Link>
+          </li>
+          <li className={dividerClass} />
+        </>
+      )}
+      <li>
+        <button
+          onClick={() => {
+            handleSignOut();
+            closeMenu();
+          }}
+          className={menuItemClass}
+        >
+          <span>👋</span> Cerrar sesion
+        </button>
+      </li>
+    </>
+  );
+
   return (
     <div ref={buttonRef} className="relative">
-      <Button
-        onClick={() => {
-          if (!isOpen && buttonRef.current) {
-            setDropdownRect(buttonRef.current.getBoundingClientRect());
-          }
-          setIsOpen(!isOpen);
-        }}
-        className={`flex items-center ${mobile ? 'gap-x-2 p-0! pr-2! border border-black/10 rounded-lg bg-white/10' : `w-full gap-3 justify-start px-3! p-2! border border-white/10 bg-black/20 backdrop-blur-sm ${isOpen ? 'rounded-t-xl rounded-b-none' : 'rounded-xl'}`}`}
+      <div
+        className={`flex items-center ${
+          mobile
+            ? ''
+            : `w-full gap-3 justify-start px-3! p-2! border border-white/10 bg-black/20 backdrop-blur-sm ${
+                isOpen ? 'rounded-t-xl rounded-b-none' : 'rounded-xl'
+              }`
+        }`}
+        style={
+          mobile
+            ? undefined
+            : {
+                background:
+                  'linear-gradient(180deg, rgba(0, 43, 55, 0.5), rgba(0, 87, 74, 0.28))',
+                borderColor: 'rgba(0, 217, 121, 0.2)',
+              }
+        }
       >
         {!mobile && userData && (
           <>
@@ -145,196 +261,97 @@ export const UserMenu = ({ mobile = false }: UserMenuProps) => {
               size="md"
               className="border-0 rounded-lg"
             />
-            {[
-              {
-                label: 'Puntos',
-                value: currentLeaderboardUser?.score ?? userData.score,
-                show: true,
-              },
-              {
-                label: 'Posición',
-                value: getPositionCompact(position!),
-                show: position !== null,
-              },
-            ]
-              .filter((item) => item.show)
-              .map((item) => (
+            <div className="relative aspect-square h-16 flex flex-col items-center justify-center rounded-lg overflow-hidden">
+              <div
+                className="absolute inset-0 scale-[-1] opacity-70"
+                style={{
+                  backgroundImage: `url(${sidebarMenuBg})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+              <span className="relative text-white/60 text-[10px] uppercase tracking-wider">
+                Puntos
+              </span>
+              <span className="relative text-white font-semibold text-xl">
+                {currentLeaderboardUser?.score ?? userData.score}
+              </span>
+            </div>
+            {position !== null && (
+              <Link
+                to="/leaderboard"
+                className="relative aspect-square h-16 flex flex-col items-center justify-center rounded-lg overflow-hidden transition-opacity hover:opacity-85"
+                aria-label="Ir al podio"
+              >
                 <div
-                  key={item.label}
-                  className="relative aspect-square h-16 flex flex-col items-center justify-center rounded-lg overflow-hidden"
-                >
-                  <div
-                    className="absolute inset-0 scale-[-1] opacity-70"
-                    style={{
-                      backgroundImage: `url(${sidebarMenuBg})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  />
-                  <span className="relative text-white/60 text-[10px] uppercase tracking-wider">
-                    {item.label}
-                  </span>
-                  <span className="relative text-white font-semibold text-xl">
-                    {item.value}
-                  </span>
-                </div>
-              ))}
-            <span
-              className={`ml-auto text-white/50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  className="absolute inset-0 scale-[-1] opacity-70"
+                  style={{
+                    backgroundImage: `url(${sidebarMenuBg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+                <span className="relative text-white/60 text-[10px] uppercase tracking-wider">
+                  Posicion
+                </span>
+                <span className="relative text-white font-semibold text-xl">
+                  {getPositionCompact(position)}
+                </span>
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={toggleMenu}
+              className={`ml-auto px-2 text-white/50 transition-transform hover:cursor-pointer hover:text-white/80 ${
+                isOpen ? 'rotate-180' : ''
+              }`}
+              aria-label={isOpen ? 'Cerrar menu' : 'Abrir menu'}
             >
               ▼
-            </span>
+            </button>
           </>
         )}
         {mobile && userData && (
-          <>
-            <ProfilePicture
-              src={userData.photoURL}
-              name={userData.displayName}
-              size="sm"
-              className="border-0 rounded-lg rounded-r-none"
-            />
-            {position !== null && (
-              <div className="relative aspect-square h-10 flex flex-col items-center justify-center overflow-hidden border-r border-white/10 pr-2">
-                <div className="absolute inset-0 scale-[-1] opacity-70" />
-                <span className="relative text-white/60 text-[8px] uppercase tracking-wider">
-                  Posición
-                </span>
-                <span className="relative text-white font-semibold text-sm">
-                  {getPositionCompact(position)}
-                </span>
-              </div>
-            )}
-            <span
-              className={`ml-auto text-white/50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-            >
-              ▾
-            </span>
-          </>
+          <button
+            type="button"
+            onClick={toggleMenu}
+            className="flex h-10 w-12 flex-col items-center justify-center gap-1.5 rounded-md transition-opacity hover:cursor-pointer hover:opacity-85"
+            aria-label={isOpen ? 'Cerrar menu' : 'Abrir menu'}
+          >
+            <span className="h-0.5 w-8 rounded-full bg-white/85" />
+            <span className="h-0.5 w-8 rounded-full bg-white/85" />
+            <span className="h-0.5 w-8 rounded-full bg-white/85" />
+          </button>
         )}
-      </Button>
+      </div>
       {isOpen &&
-        (() => {
-          const menuContent = (
-            <>
-              {/* Navigation Items (desktop only) */}
-              {!mobile && (
-                <>
-                  <li>
-                    <Link
-                      to={`/${userData?.userName}`}
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>⚽</span> Mis pronósticos
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/leaderboard"
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>🥇</span> Podio
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/standings"
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>#</span> Tabla de posiciones
-                    </Link>
-                  </li>
-                  {/* <li>
-                    <Link
-                      to="/leagues"
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>🏆</span> Mis ligas
-                    </Link>
-                  </li> */}
-                </>
-              )}
-              <li>
-                <Link
-                  to="/edit-profile"
-                  onClick={closeMenu}
-                  className={menuItemClass}
-                >
-                  <span>✏️</span> Editar perfil
-                </Link>
-              </li>
-              <li className={dividerClass} />
-              {/* Info Links (mobile only) */}
-              {mobile && (
-                <>
-                  <li>
-                    <Link
-                      to="/rules"
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>📋</span> Reglas
-                    </Link>
-                  </li>
-                  {/* <li>
-                    <Link
-                      to="/about"
-                      onClick={closeMenu}
-                      className={menuItemClass}
-                    >
-                      <span>ℹ️</span> About
-                    </Link>
-                  </li> */}
-                  <li className={dividerClass} />
-                </>
-              )}
-              {/* Cerrar sesión */}
-              <li>
-                <button
-                  onClick={() => {
-                    handleSignOut();
-                    closeMenu();
-                  }}
-                  className={menuItemClass}
-                >
-                  <span>👋</span> Cerrar sesión
-                </button>
-              </li>
-            </>
-          );
-
-          return mobile ? (
-            createPortal(
+        (mobile
+          ? createPortal(
               <ul
                 ref={dropdownRef}
                 className="p-2 fixed left-0 right-0 bg-black/80 backdrop-blur-lg border-b border-white/10 shadow-xl z-50"
-                style={{ top: 'calc(env(safe-area-inset-top) + 57px)' }}
+                style={{ top: 'calc(env(safe-area-inset-top) + 76px)' }}
               >
                 {menuContent}
               </ul>,
               document.body
             )
-          ) : dropdownRect ? (
-            createPortal(
-              <ul
-                ref={dropdownRef}
-                className="p-2 fixed z-100 backdrop-blur-2xl bg-black/90 border border-white/10 border-t-0 rounded-b-xl shadow-xl"
-                style={{
-                  top: dropdownRect.bottom,
-                  left: dropdownRect.left,
-                  width: dropdownRect.width,
-                }}
-              >
-                {menuContent}
-              </ul>,
-              document.body
-            )
-          ) : null;
-        })()}
+          : dropdownRect
+            ? createPortal(
+                <ul
+                  ref={dropdownRef}
+                  className="p-2 fixed z-100 backdrop-blur-2xl bg-black/90 border border-white/10 border-t-0 rounded-b-xl shadow-xl"
+                  style={{
+                    top: dropdownRect.bottom,
+                    left: dropdownRect.left,
+                    width: dropdownRect.width,
+                  }}
+                >
+                  {menuContent}
+                </ul>,
+                document.body
+              )
+            : null)}
     </div>
   );
 };

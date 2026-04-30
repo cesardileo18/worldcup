@@ -108,16 +108,6 @@ const DetailTable = ({ row }: { row: StandingRow }) => (
               </tr>
             ))
           )}
-          {row.bonusPoints > 0 && (
-            <tr>
-              <td className="py-3 pr-3 font-semibold text-sky-100" colSpan={4}>
-                Bonus por racha: acerto resultados seguidos
-              </td>
-              <td className="py-3 pl-2 text-right font-black text-sky-100">
-                {pointsText(row.bonusPoints)} pts
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>
@@ -282,14 +272,13 @@ export const Standings = () => {
         </div>
 
         {currentUserRow && (
-          <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
             <SummaryBox
               label="Tu posicion"
               value={`#${currentUserRow.position}`}
             />
             <SummaryBox label="Tus puntos" value={currentUserRow.score} />
             <SummaryBox label="Exactos" value={currentUserRow.exactCount} />
-            <SummaryBox label="Bonus" value={currentUserRow.bonusPoints} />
           </div>
         )}
 
@@ -329,9 +318,6 @@ export const Standings = () => {
                       Resultados
                     </th>
                     <th className="w-20 px-3 py-3 text-right font-medium md:px-4">
-                      Bonus
-                    </th>
-                    <th className="w-20 px-3 py-3 text-right font-medium md:px-4">
                       Jugados
                     </th>
                     <th className="w-24 px-3 py-3 text-right font-medium md:px-4">
@@ -364,9 +350,6 @@ export const Standings = () => {
                         </td>
                         <td className="px-3 py-3 text-right font-semibold text-white/85 md:px-4">
                           {row.resultCount}
-                        </td>
-                        <td className="px-3 py-3 text-right font-semibold text-sky-100 md:px-4">
-                          {row.bonusPoints}
                         </td>
                         <td className="px-3 py-3 text-right font-semibold text-white/85 md:px-4">
                           {row.playedPredictions}

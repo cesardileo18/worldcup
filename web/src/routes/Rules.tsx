@@ -11,25 +11,25 @@ const winnerExamples: Example[] = [
   {
     prediction: '2 - 1',
     explanation: 'Acertaste el marcador exacto.',
-    points: '15 pts',
+    points: '10 pts',
     tone: 'text-green-400',
   },
   {
+    prediction: '2 - 0',
+    explanation: 'Acertaste que gana Argentina y los goles de Argentina.',
+    points: '8 pts',
+    tone: 'text-yellow-400',
+  },
+  {
     prediction: '3 - 1',
-    explanation: 'Acertaste que gana Argentina. Te pasaste por 1 gol.',
-    points: '9 pts',
+    explanation: 'Acertaste que gana Argentina y los goles de Brasil.',
+    points: '8 pts',
     tone: 'text-yellow-400',
   },
   {
-    prediction: '8 - 1',
-    explanation: 'Acertaste que gana Argentina. Te pasaste por 6 goles.',
-    points: '4 pts',
-    tone: 'text-yellow-400',
-  },
-  {
-    prediction: '8 - 5',
-    explanation: 'Acertaste que gana Argentina, pero quedaste muy lejos.',
-    points: '1 pt',
+    prediction: '3 - 2',
+    explanation: 'Acertaste que gana Argentina, pero ningun marcador exacto.',
+    points: '6 pts',
     tone: 'text-yellow-400',
   },
   {
@@ -40,7 +40,7 @@ const winnerExamples: Example[] = [
   },
   {
     prediction: '1 - 2',
-    explanation: 'Pusiste que gana Brazil.',
+    explanation: 'Pusiste que gana Brasil.',
     points: '0 pts',
     tone: 'text-red-400',
   },
@@ -48,33 +48,21 @@ const winnerExamples: Example[] = [
 
 const drawExamples: Example[] = [
   {
-    prediction: '0 - 0',
+    prediction: '1 - 1',
     explanation: 'Acertaste el empate exacto.',
-    points: '15 pts',
+    points: '10 pts',
     tone: 'text-green-400',
   },
   {
-    prediction: '1 - 1',
-    explanation: 'Acertaste empate. Fallaste por 1 gol de cada lado.',
-    points: '8 pts',
-    tone: 'text-yellow-400',
-  },
-  {
-    prediction: '2 - 2',
-    explanation: 'Acertaste empate. Fallaste por 2 goles de cada lado.',
+    prediction: '0 - 0',
+    explanation: 'Acertaste que era empate, pero no el marcador exacto.',
     points: '6 pts',
     tone: 'text-yellow-400',
   },
   {
-    prediction: '4 - 4',
-    explanation: 'Acertaste empate, pero quedaste bastante lejos.',
-    points: '2 pts',
-    tone: 'text-yellow-400',
-  },
-  {
-    prediction: '5 - 5',
-    explanation: 'Acertaste empate, pero quedaste muy lejos.',
-    points: '1 pt',
+    prediction: '2 - 2',
+    explanation: 'Acertaste que era empate, pero no el marcador exacto.',
+    points: '6 pts',
     tone: 'text-yellow-400',
   },
   {
@@ -94,8 +82,8 @@ const ExampleTable = ({
   realScore: string;
   examples: Example[];
 }) => (
-  <div className="border border-white/10 rounded-lg overflow-hidden">
-    <div className="px-4 py-3 bg-white/10">
+  <div className="overflow-hidden rounded-lg border border-white/10">
+    <div className="bg-white/10 px-4 py-3">
       <h3 className="font-semibold text-white">{title}</h3>
       <p className="text-sm text-white/60">Resultado real: {realScore}</p>
     </div>
@@ -103,13 +91,13 @@ const ExampleTable = ({
       {examples.map((example) => (
         <div
           key={`${title}-${example.prediction}`}
-          className="grid grid-cols-[72px_1fr_64px] gap-3 px-4 py-3 items-center"
+          className="grid grid-cols-[72px_1fr_64px] items-center gap-3 px-4 py-3"
         >
-          <span className="font-mono text-white text-sm">
+          <span className="font-mono text-sm text-white">
             {example.prediction}
           </span>
-          <span className="text-white/70 text-sm">{example.explanation}</span>
-          <span className={`${example.tone} font-bold text-right`}>
+          <span className="text-sm text-white/70">{example.explanation}</span>
+          <span className={`${example.tone} text-right font-bold`}>
             {example.points}
           </span>
         </div>
@@ -121,18 +109,18 @@ const ExampleTable = ({
 export const Rules = () => {
   return (
     <AppLayout>
-      <div className="pt-8 px-4 pb-8 max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">Reglas</h1>
+      <div className="mx-auto max-w-2xl px-4 pb-8 pt-8">
+        <h1 className="mb-8 text-3xl font-bold text-white">Reglas</h1>
 
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">
+        <Card className="mb-6 p-6">
+          <h2 className="mb-4 text-xl font-semibold text-white">
             Fecha limite para pronosticos
           </h2>
           <div className="flex items-start gap-3 text-white/80">
             <span className="text-2xl">Reloj</span>
             <p>
               Los pronosticos deben enviarse{' '}
-              <span className="text-white font-semibold">
+              <span className="font-semibold text-white">
                 al menos 10 minutos antes del inicio del partido
               </span>
               . Despues de eso, quedan bloqueados y no pueden modificarse.
@@ -140,40 +128,60 @@ export const Rules = () => {
           </div>
         </Card>
 
-        <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">
+        <Card className="mb-6 p-6">
+          <h2 className="mb-4 text-xl font-semibold text-white">
             Como se calculan los puntos
           </h2>
 
           <div className="space-y-5 text-white/80">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">15</span>
+              <span className="text-2xl">10</span>
               <div>
                 <h3 className="font-semibold text-white">
-                  Marcador exacto: 15 puntos
+                  Marcador exacto: 10 puntos
                 </h3>
                 <p className="text-sm">
-                  Si acertas exactamente los goles de los dos equipos, ganas 15
+                  Si acertas exactamente los goles de los dos equipos, ganas 10
                   puntos.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-2xl">10</span>
+              <span className="text-2xl">8</span>
               <div>
                 <h3 className="font-semibold text-white">
-                  Ganador correcto o empate correcto: de 1 a 10 puntos
+                  Ganador correcto y un marcador exacto: 8 puntos
                 </h3>
                 <p className="text-sm">
-                  Si acertas quien gana, o acertas que el partido termina
-                  empatado, siempre sumas al menos 1 punto.
+                  Si acertas quien gana y tambien acertas los goles de uno de
+                  los dos equipos, ganas 8 puntos.
                 </p>
-                <p className="text-sm mt-2">
-                  Para calcularlo, arrancamos desde 10 puntos y se resta 1
-                  punto por cada gol de diferencia entre tu pronostico y el
-                  resultado real. Si quedaste muy lejos, igual te queda 1 punto
-                  por haber acertado el ganador o el empate.
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">6</span>
+              <div>
+                <h3 className="font-semibold text-white">
+                  Ganador correcto: 6 puntos
+                </h3>
+                <p className="text-sm">
+                  Si acertas quien gana, pero no acertas el marcador de ningun
+                  equipo, ganas 6 puntos.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">6</span>
+              <div>
+                <h3 className="font-semibold text-white">
+                  Empate correcto no exacto: 6 puntos
+                </h3>
+                <p className="text-sm">
+                  Si el partido termina empatado y vos tambien pusiste empate,
+                  pero con otro marcador, ganas 6 puntos.
                 </p>
               </div>
             </div>
@@ -185,98 +193,39 @@ export const Rules = () => {
                   Resultado incorrecto: 0 puntos
                 </h3>
                 <p className="text-sm">
-                  Si pusiste que gana un equipo y gana el otro, o si pusiste
-                  empate y no empataron, no sumas puntos.
+                  Si no acertas el ganador o no acertas que era empate, no
+                  sumas puntos.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">+2</span>
-              <div>
-                <h3 className="font-semibold text-white">
-                  Bonus por racha: 2 puntos extra
-                </h3>
-                <p className="text-sm">
-                  Si acertas el resultado de dos partidos seguidos, sumas 2
-                  puntos extra en la clasificacion.
-                </p>
-                <p className="text-sm mt-2">
-                  Cuenta como acierto haber acertado el ganador o haber acertado
-                  que era empate. No hace falta que el marcador sea exacto.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-lg bg-white/10 border border-white/10 p-4">
-              <h3 className="font-semibold text-white mb-2">
-                Forma simple de pensarlo
+            <div className="rounded-lg border border-white/10 bg-white/10 p-4">
+              <h3 className="mb-2 font-semibold text-white">
+                No hay bonus por racha
               </h3>
-              <p className="text-sm mb-2">
-                Primero se revisa si acertaste el tipo de resultado: gana el
-                local, gana el visitante o empatan.
-              </p>
               <p className="text-sm">
-                Si eso esta bien, se mide que tan cerca estuviste del marcador.
-                Cuanto mas cerca, mas puntos. Cuanto mas lejos, menos puntos,
-                pero nunca menos de 1.
-              </p>
-              <p className="text-sm mt-2">
-                Despues se revisa la racha. Si acertaste dos partidos jugados
-                uno atras del otro, se agregan 2 puntos extra al total.
+                Los puntos salen solamente de cada pronostico individual. No se
+                suman puntos extra por acertar partidos seguidos.
               </p>
             </div>
           </div>
 
-          <h2 className="mt-8 text-xl font-semibold text-white mb-4">
+          <h2 className="mb-4 mt-8 text-xl font-semibold text-white">
             Ejemplos
           </h2>
 
           <div className="space-y-5">
             <ExampleTable
               title="Cuando hay un ganador"
-              realScore="Argentina 2 - 1 Brazil"
+              realScore="Argentina 2 - 1 Brasil"
               examples={winnerExamples}
             />
 
             <ExampleTable
               title="Cuando el partido termina empatado"
-              realScore="Uruguay 0 - 0 Colombia"
+              realScore="Uruguay 1 - 1 Colombia"
               examples={drawExamples}
             />
-
-            <div className="rounded-lg bg-white/10 border border-white/10 p-4 text-white/80">
-              <h3 className="font-semibold text-white mb-2">
-                Ejemplo explicado: Argentina 2 - 1 Brazil
-              </h3>
-              <p className="text-sm mb-2">
-                Si pusiste 8 - 1, acertaste que gana Argentina. Por eso entras
-                en la regla de hasta 10 puntos.
-              </p>
-              <p className="text-sm mb-2">
-                Argentina hizo 2 y vos pusiste 8: hay 6 goles de diferencia.
-                Brazil hizo 1 y vos pusiste 1: hay 0 goles de diferencia.
-              </p>
-              <p className="text-sm font-semibold text-white">
-                Entonces: 10 puntos menos 6 de diferencia = 4 puntos. Si la
-                diferencia fuera de 10 goles o mas, igual sumarias 1 punto por
-                haber acertado que ganaba Argentina.
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-white/10 border border-white/10 p-4 text-white/80">
-              <h3 className="font-semibold text-white mb-2">
-                Ejemplo de racha
-              </h3>
-              <p className="text-sm mb-2">
-                Partido 1: acertaste que gana Argentina. Partido 2: acertaste
-                que Uruguay y Colombia empatan.
-              </p>
-              <p className="text-sm font-semibold text-white">
-                Como fueron dos aciertos seguidos, se suman 2 puntos extra a tu
-                total.
-              </p>
-            </div>
           </div>
         </Card>
       </div>
